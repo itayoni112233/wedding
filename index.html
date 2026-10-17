@@ -277,6 +277,13 @@ input{font:inherit;color:inherit}
 .att-add{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--forest-2);border:1px dashed color-mix(in srgb,var(--forest-2) 45%,transparent);border-radius:99px;padding:4px 12px;cursor:pointer}
 .att-add::before{content:"+";font-size:.95rem;line-height:1}
 .att-msg{font-size:.76rem;color:var(--muted)}
+.viewer{position:fixed;inset:0;z-index:60;background:rgba(20,10,14,.82);display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top,0px)) max(10px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px));gap:8px}
+.viewer-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:#fff}
+.viewer-bar b{flex:1 1 140px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.viewer-btn{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:7px 12px;font-size:.85rem;font-weight:600;text-decoration:none}
+.viewer-body{flex:1;min-height:0;display:grid;place-items:center;background:#fff;border-radius:14px;overflow:auto}
+.viewer-body img{max-width:100%;max-height:100%;object-fit:contain}
+.viewer-body iframe{width:100%;height:100%;border:0}
 .transfers{border-top:1px dashed var(--line);padding-top:8px}
 .transfers summary{cursor:pointer;font-size:.86rem;font-weight:600;color:var(--forest-2);padding:2px 0 8px}
 .tr-row{display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:6px 8px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:8px;margin-bottom:8px}
@@ -656,10 +663,7 @@ body:not([data-tab="budget"]) .mini-bar{display:none}
   }};
   window.claude={use:async n=>n==="db"?db:n==="downloads"?downloads:null};
 
-  /* קבלות ואסמכתאות: מחסן קבצים מוגן, התיקייה היא טביעת הקוד הסודי */
-  const STORE="https://odaeycwcyuqfmjrfcvtd.supabase.co/storage/v1/";
-  let folderP=null;
-  const folder=()=>folderP||(folderP=crypto.subtle.digest("SHA-256",new TextEncoder().encode(code)).then(b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")));
+  /* קבלות ואסמכתאות: נשמרות בתוך מסד הנתונים, מאחורי הקוד הסודי */
   async function shrink(file){
     if(!/^image\/(jpeg|png|webp)$/.test(file.type))return file;
     try{
@@ -670,22 +674,23 @@ body:not([data-tab="budget"]) .mini-bar{display:none}
       return await new Promise(r=>c.toBlob(b=>r(b||file),"image/jpeg",.82));
     }catch(e){return file}
   }
+  const toB64=blob=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]||"");r.onerror=rej;r.readAsDataURL(blob)});
   window.weddingFiles={
     async upload(file){
-      const f=await folder(),blob=await shrink(file);
-      const type=blob.type||file.type||"application/octet-stream";
-      const ext=type==="application/pdf"?"pdf":type==="image/png"?"png":type==="image/webp"?"webp":type==="image/heic"?"heic":"jpg";
-      const path=f+"/"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8)+"."+ext;
-      const r=await fetch(STORE+"object/receipts/"+path,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":type},body:blob});
-      if(!r.ok)throw new Error("upload "+r.status);
-      return{path,name:(file.name||("קובץ."+ext)).slice(0,80),type,size:blob.size};
+      const blob=await shrink(file);
+      let type=blob.type||file.type||"";if(!type&&/\.pdf$/i.test(file.name||""))type="application/pdf";
+      if(!/^(image\/(jpeg|png|webp|heic|heif)|application\/pdf)$/.test(type))throw new Error("type");
+      if(blob.size>8e6)throw new Error("size");
+      const id=await rpc("wedding_file_put",{p_code:code,p_name:file.name||"קובץ",p_type:type,p_b64:await toB64(blob)});
+      return{path:"db:"+id,name:(file.name||"קובץ").slice(0,80),type,size:blob.size};
     },
-    async url(path){
-      const r=await fetch(STORE+"object/sign/receipts/"+path,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({expiresIn:3600})});
-      const j=await r.json().catch(()=>null);if(!r.ok||!j||!j.signedURL)throw new Error("sign "+r.status);
-      return STORE.replace(/\/$/,"")+j.signedURL;
+    async blob(path){
+      const j=await rpc("wedding_file_get",{p_code:code,p_id:String(path).replace(/^db:/,"")});
+      if(!j||!j.b64)throw new Error("missing");
+      const bin=atob(j.b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+      return new Blob([u],{type:j.type});
     },
-    async remove(path){try{await fetch(STORE+"object/receipts/"+path,{method:"DELETE",headers:{apikey:KEY,Authorization:"Bearer "+KEY}})}catch(e){}}
+    async remove(path){try{await rpc("wedding_file_del",{p_code:code,p_id:String(path).replace(/^db:/,"")})}catch(e){}}
   };
 })();
 </script>
@@ -1089,6 +1094,16 @@ function recalcPay(){
 }
 const findTr=el=>{const row=el.closest("[data-tid]");const yid=el.closest("[data-yid]");if(!row||!yid)return{};const p=state.payers.find(y=>y.id===yid.dataset.yid);const t=p&&p.transfers.find(x=>x.id===row.dataset.tid);return{p,t}};
 const fileOwner=el=>{const pr=el.closest("[data-pid]");if(pr)return findPay(el).x;const tr=el.closest("[data-tid]");if(tr)return findTr(el).t;return null};
+function showFile(blob,name){
+  const url=URL.createObjectURL(blob),isImg=/^image\//.test(blob.type);
+  const ov=document.createElement("div");ov.className="viewer";ov.setAttribute("dir","rtl");ov.setAttribute("role","dialog");ov.setAttribute("aria-label",name);
+  ov.innerHTML=`<div class="viewer-bar"><b>${esc(name)}</b><a class="viewer-btn" href="${url}" download="${esc(name)}">שמירה</a><a class="viewer-btn" href="${url}" target="_blank" rel="noopener">פתיחה בחלון</a><button type="button" class="viewer-btn close">סגירה</button></div>
+    <div class="viewer-body">${isImg?`<img src="${url}" alt="${esc(name)}">`:`<iframe src="${url}" title="${esc(name)}"></iframe>`}</div>`;
+  const close=()=>{ov.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);document.removeEventListener("keydown",onKey)};
+  const onKey=e=>{if(e.key==="Escape")close()};
+  ov.querySelector(".close").addEventListener("click",close);ov.addEventListener("click",e=>{if(e.target===ov)close()});
+  document.addEventListener("keydown",onKey);document.body.appendChild(ov);ov.querySelector(".close").focus();
+}
 function filesHTML(files,label){
   const can=!!window.weddingFiles;
   return`<div class="att">${files.map((f,k)=>`<span class="att-chip"><button type="button" class="att-open" data-open="${esc(f.path)}" title="${esc(f.name)}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 4.5 5.8 9.2a1.3 1.3 0 0 0 1.9 1.9l5-5a2.6 2.6 0 0 0-3.7-3.7l-5 5a3.9 3.9 0 0 0 5.5 5.5l4.3-4.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>${esc(f.name.length>22?f.name.slice(0,20)+"…":f.name)}</button>${can?`<button type="button" class="att-x" data-rmfile="${k}" aria-label="הסרת הקובץ">×</button>`:""}</span>`).join("")}${can?`<label class="att-add">${label}<input type="file" accept="image/*,application/pdf" data-upload hidden></label>`:""}<span class="att-msg" role="status"></span></div>`;
@@ -1100,14 +1115,13 @@ $("tab-pay").addEventListener("change",async e=>{
   if(file.size>25e6){msg.textContent="הקובץ גדול מדי (עד 25MB).";return}
   msg.textContent="מעלה…";
   try{const f=await window.weddingFiles.upload(file);owner.files.push(f);renderPay();recalcPay();save()}
-  catch(err){msg.textContent="ההעלאה נכשלה, נסו שוב."}
+  catch(err){msg.textContent=err&&err.message==="size"?"הקובץ גדול מדי (עד 8MB).":err&&err.message==="type"?"אפשר לצרף רק תמונה או PDF.":"ההעלאה נכשלה, נסו שוב."}
 });
 $("tab-pay").addEventListener("click",async e=>{
   const o=e.target.closest("[data-open]");
-  if(o){e.preventDefault();if(!window.weddingFiles)return;
-    const w=window.open("","_blank");
-    try{const u=await window.weddingFiles.url(o.dataset.open);if(w)w.location.href=u;else location.href=u}
-    catch(err){if(w)w.close();const m=o.closest(".att").querySelector(".att-msg");if(m)m.textContent="לא הצלחתי לפתוח את הקובץ."}
+  if(o){e.preventDefault();if(!window.weddingFiles)return;const m=o.closest(".att").querySelector(".att-msg");if(m)m.textContent="פותח…";
+    try{const b=await window.weddingFiles.blob(o.dataset.open);if(m)m.textContent="";showFile(b,o.title||"קובץ")}
+    catch(err){if(m)m.textContent="לא הצלחתי לפתוח את הקובץ."}
     return}
   const rm=e.target.closest("[data-rmfile]");
   if(rm){const owner=fileOwner(rm);if(!owner)return;
