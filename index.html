@@ -245,8 +245,9 @@ input{font:inherit;color:inherit}
 @media (max-width:420px){.payer-grid{grid-template-columns:1fr 1fr}.payer-grid .st-cell:last-child{grid-column:1/-1}}
 .payer-bal{font-size:.84rem;font-weight:600;color:var(--muted)}
 .payer-bal.due{color:var(--warn)}.payer-bal.over{color:var(--gain)}.payer-bal.even{color:var(--gain)}
-.up-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:10px 16px;border-top:1px solid var(--line)}
-.up-row .chip{grid-column:1/-1;justify-self:start}
+.up-row{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:6px 10px;align-items:center;padding:10px 16px;border-top:1px solid var(--line)}
+.up-row .chip{justify-self:end}
+.late-t{color:var(--loss);font-weight:600}
 .up-date{font-weight:600;font-size:.9rem;display:flex;flex-direction:column}
 .up-date small{color:var(--loss);font-size:.7rem;font-weight:500}
 .up-row.late{background:var(--loss-soft)}
@@ -266,6 +267,15 @@ input{font:inherit;color:inherit}
 .pay-date,.pay-payer{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:6px 8px;font-size:.88rem;min-width:0;width:100%}
 .pay-row .chip{justify-self:start}
 .pay-row .pay-note{grid-column:1/-1}
+.pay-for{grid-column:1/-1;border:0;border-bottom:1px dashed var(--line);background:transparent;color:var(--ink);font-weight:600;font-size:.92rem;padding:4px 2px;min-width:0;width:100%}
+.pay-for:focus{outline:none;border-bottom-color:var(--gold)}
+.pay-for::placeholder{color:var(--faint);font-weight:500}
+.pay-head{align-items:flex-start}
+.pay-name{flex:1}
+.pay-name .i-name{font-weight:600;font-size:1rem}
+.pay-cost{flex:none;width:130px;display:flex;flex-direction:column;gap:2px}
+.pay-cost label{font-size:.7rem;color:var(--muted)}
+.pay-cost .pay-left{text-align:right}
 .pay-row .link{justify-self:end}
 .pay-add{align-self:flex-start;font-size:.8rem}
 @media (max-width:440px){#tab-pay .stats .stat:last-child{grid-column:1/-1}}
@@ -469,6 +479,7 @@ body:not([data-tab="budget"]) .mini-bar{display:none}
     <section class="card2" aria-labelledby="pi-h">
       <div class="hd"><h3 id="pi-h">לפי ספק</h3><span>מוסיפים כל מקדמה ותשלום</span></div>
       <div id="pay-items"></div>
+      <datalist id="pay-for-list"><option value="מקדמה"><option value="תשלום ראשון"><option value="תשלום שני"><option value="תשלום שלישי"><option value="יתרה"><option value="תשלום סופי"><option value="תוספת"></datalist>
     </section>
   </div>
   <div class="tab" id="tab-guests" hidden>
@@ -667,7 +678,7 @@ function normalize(s){
   const groups=Array.isArray(s.groups)&&s.groups.length?s.groups.slice(0,4):e.groups;
   const gids=new Set(groups.map(g=>g.id));
   return{v:2,guests:Number.isFinite(+s.guests)?+s.guests:300,reservePct:Number.isFinite(+s.reservePct)?+s.reservePct:10,groups,
-    items:(s.items||[]).map(i=>({id:i.id||uid(),group:gids.has(i.group)?i.group:groups[groups.length-1].id,name:String(i.name??""),amount:+i.amount||0,kind:KIND[i.kind]?i.kind:"fixed",base:+i.base||0,status:STATUS[i.status]?i.status:"est",on:i.on!==false,note:String(i.note??""),low:+i.low||0,high:+i.high||0,payments:(Array.isArray(i.payments)?i.payments:[]).map(x=>({id:String(x.id||uid("p")),amount:+x.amount||0,date:String(x.date||""),payer:String(x.payer||"us"),paid:x.paid!==false,note:String(x.note??"")}))})),
+    items:(s.items||[]).map(i=>({id:i.id||uid(),group:gids.has(i.group)?i.group:groups[groups.length-1].id,name:String(i.name??""),amount:+i.amount||0,kind:KIND[i.kind]?i.kind:"fixed",base:+i.base||0,status:STATUS[i.status]?i.status:"est",on:i.on!==false,note:String(i.note??""),low:+i.low||0,high:+i.high||0,payments:(Array.isArray(i.payments)?i.payments:[]).map(x=>({id:String(x.id||uid("p")),amount:+x.amount||0,date:String(x.date||""),payer:String(x.payer||"us"),paid:x.paid!==false,for:String(x.for??""),note:String(x.note??"")}))})),
     incomes:(s.incomes||[]).map(i=>({id:i.id||uid("n"),name:String(i.name??""),amount:+i.amount||0,on:i.on!==false,note:String(i.note??"")})),
     gifts:Array.isArray(s.gifts)&&s.gifts.length?s.gifts.map(g=>({id:g.id,label:String(g.label??""),share:+g.share||0,amount:+g.amount||0})):e.gifts,
     payers:(Array.isArray(s.payers)&&s.payers.length?s.payers:e.payers).map(x=>({id:String(x.id||uid("y")),name:String(x.name??""),pledge:+x.pledge||0}))};
@@ -863,8 +874,8 @@ function armDelete(b,doIt){
   setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent="מחיקה"}},3000);
 }
 function fieldInput(obj,f,el){
-  if(f==="amount"||f==="base"){obj[f]=parse(el.value);recalc()}
-  else obj[f]=el.value.slice(0,f==="note"?240:80);
+  if(f==="amount"||f==="base"){obj[f]=parse(el.value);recalc();const pw=obj.id&&document.querySelector(`#pay-items [data-item="${CSS.escape(obj.id)}"] [data-if="amount"]`);if(pw&&f==="amount")pw.value=commas(obj.amount)}
+  else obj[f]=el.value.slice(0,f==="note"?240:80);if(f==="name"&&obj.id){const pw=document.querySelector(`#pay-items [data-item="${CSS.escape(obj.id)}"] [data-if="name"]`);if(pw)pw.value=obj.name}
   save();
 }
 $("groups").addEventListener("input",e=>{
@@ -933,6 +944,7 @@ function payCalc(){
 function payerOptions(sel){return state.payers.map(p=>`<option value="${esc(p.id)}"${p.id===sel?" selected":""}>${esc(p.name||"בלי שם")}</option>`).join("")}
 function paymentHTML(i,x){
   return`<div class="pay-row${x.paid?"":" sched"}" data-pid="${esc(x.id)}" data-item="${esc(i.id)}">
+    <input class="pay-for" data-pf="for" list="pay-for-list" value="${esc(x.for)}" placeholder="עבור מה? למשל מקדמה" aria-label="עבור מה">
     <input type="date" class="pay-date" data-pf="date" value="${esc(x.date)}" aria-label="תאריך">
     <div class="i-amt-wrap"><input class="i-amt" data-pf="amount" inputmode="numeric" value="${commas(x.amount)}" placeholder="0" aria-label="סכום"></div>
     <select class="pay-payer" data-pf="payer" aria-label="מי שילם">${payerOptions(x.payer)}</select>
@@ -948,12 +960,16 @@ function renderPay(){
     const its=state.items.filter(i=>i.group===gr.id&&(i.on||i.payments.length));
     if(!its.length)return"";
     return`<div class="pay-group"><div class="sec-head">${esc(gr.name)}</div>`+its.map(i=>`<div class="pay-item" data-item="${esc(i.id)}">
-      <div class="pay-head"><div class="pay-name">${esc(i.name||"בלי שם")}<small class="num" data-ph="${esc(i.id)}"></small></div><div class="pay-left num" data-pl="${esc(i.id)}"></div></div>
+      <div class="pay-head">
+        <div class="pay-name"><input class="i-name" data-if="name" value="${esc(i.name)}" placeholder="שם הספק" aria-label="שם הספק"><small class="num" data-ph="${esc(i.id)}"></small></div>
+        <div class="pay-cost"><label>${i.kind==="perGuest"?"מחיר לאורח":i.kind==="extraGuest"?`לאורח מעל ${i.base}`:"עלות"}</label><div class="i-amt-wrap"><input class="i-amt" data-if="amount" inputmode="numeric" value="${commas(i.amount)}" placeholder="0" aria-label="עלות"></div><div class="pay-left num" data-pl="${esc(i.id)}"></div></div>
+      </div>
       <div class="cum-bar" aria-hidden="true"><i data-pb="${esc(i.id)}"></i></div>
       ${i.payments.map(x=>paymentHTML(i,x)).join("")}
       <button type="button" class="add-btn pay-add" data-pact="add">הוספת תשלום</button>
     </div>`).join("")+`</div>`;
   }).join("")||`<div class="empty2">אין עדיין הוצאות בתקציב.</div>`;
+  renderUpcoming();
   $("payers").innerHTML=state.payers.map(p=>`<div class="payer" data-yid="${esc(p.id)}">
       <div class="payer-top"><input class="i-name" data-yf="name" value="${esc(p.name)}" placeholder="שם המשלם" aria-label="שם המשלם"><button type="button" class="link danger" data-yact="del">מחיקה</button></div>
       <div class="payer-grid">
@@ -964,6 +980,16 @@ function renderPay(){
       <div class="payer-bal" data-yb="${esc(p.id)}"></div>
     </div>`).join("");
 }
+function renderUpcoming(){
+  const box=$("upcoming");if(!box)return;
+  const c=payCalc(),today=todayISO();
+  box.innerHTML=c.upcoming.length?c.upcoming.map(u=>{const late=u.x.date&&u.x.date<today;return`<div class="up-row${late?" late":""}" data-pid="${esc(u.x.id)}" data-item="${esc(u.i.id)}">
+      <div class="up-main"><b>${esc(u.i.name||"בלי שם")}${u.x.for?` · ${esc(u.x.for)}`:""}</b><small>${esc(payerName(u.x.payer))}${u.x.note?" · "+esc(u.x.note):""}${late?' · <span class="late-t">עבר המועד</span>':""}</small></div>
+      <button type="button" class="chip closed" data-pact="mark">סימון כשולם</button>
+      <input type="date" class="pay-date" data-pf="date" value="${esc(u.x.date)}" aria-label="תאריך">
+      <div class="i-amt-wrap"><input class="i-amt" data-pf="amount" inputmode="numeric" value="${commas(u.x.amount)}" aria-label="סכום"></div>
+    </div>`}).join(""):`<div class="empty2">אין תשלומים מתוכננים. מוסיפים תשלום בספק ומסמנים אותו כ"מתוכנן".</div>`;
+}
 function recalcPay(){
   if(!$("p-paid"))return;
   const c=payCalc();
@@ -973,13 +999,6 @@ function recalcPay(){
   $("p-sched").textContent=ils(c.sched);$("p-unpl").textContent=ils(c.unplanned);
   const nx=c.upcoming.find(u=>u.x.date)||c.upcoming[0];
   $("p-next").textContent=nx?`${fmtDate(nx.x.date)} · ${ils(nx.x.amount)}`:"אין";
-  const today=todayISO();
-  $("upcoming").innerHTML=c.upcoming.length?c.upcoming.map(u=>`<div class="up-row${u.x.date&&u.x.date<today?" late":""}" data-pid="${esc(u.x.id)}" data-item="${esc(u.i.id)}">
-      <div class="up-date num">${fmtDate(u.x.date)}${u.x.date&&u.x.date<today?'<small>עבר המועד</small>':""}</div>
-      <div class="up-main"><b>${esc(u.i.name||"בלי שם")}</b><small>${esc(payerName(u.x.payer))}${u.x.note?" · "+esc(u.x.note):""}</small></div>
-      <div class="up-amt num">${ils(u.x.amount)}</div>
-      <button type="button" class="chip closed" data-pact="mark">סימון כשולם</button>
-    </div>`).join(""):`<div class="empty2">אין תשלומים מתוכננים. מוסיפים תשלום בספק ומסמנים אותו כ"מתוכנן".</div>`;
   c.rows.forEach(r=>{
     const id=r.i.id,set=(a,v)=>{const el=document.querySelector(`[${a}="${CSS.escape(id)}"]`);if(el)el.textContent=v};
     set("data-ph",`עלות ${ils(r.cost)} · שולם ${ils(r.paid)}${r.sched?` · מתוכנן ${ils(r.sched)}`:""}`);
@@ -1005,14 +1024,19 @@ const findPay=el=>{const row=el.closest("[data-pid]");if(!row)return{};const it=
 $("tab-pay").addEventListener("input",e=>{
   const t=e.target;
   if(t.dataset.pf){const{x}=findPay(t);if(!x)return;const f=t.dataset.pf;
-    if(f==="amount")x.amount=parse(t.value);else if(f==="note")x.note=t.value.slice(0,200);else if(f==="date")x.date=t.value;else if(f==="payer")x.payer=t.value;
+    if(f==="amount")x.amount=parse(t.value);else if(f==="for")x.for=t.value.slice(0,80);else if(f==="note")x.note=t.value.slice(0,200);else if(f==="date")x.date=t.value;else if(f==="payer")x.payer=t.value;
+    document.querySelectorAll(`[data-pid="${CSS.escape(x.id)}"] [data-pf="${f}"]`).forEach(el=>{if(el!==t)el.value=f==="amount"?commas(x.amount):(x[f]??"")});
     recalcPay();save();return}
+  if(t.dataset.if){const it=state.items.find(i=>i.id===t.closest(".pay-item").dataset.item);if(!it)return;
+    if(t.dataset.if==="amount")it.amount=parse(t.value);else it.name=t.value.slice(0,80);
+    const tw=document.querySelector(`#groups [data-id="${CSS.escape(it.id)}"] [data-f="${t.dataset.if}"]`);if(tw)tw.value=t.dataset.if==="amount"?commas(it.amount):it.name;
+    recalc();save();return}
   if(t.dataset.yf){const p=state.payers.find(y=>y.id===t.closest("[data-yid]").dataset.yid);if(!p)return;
     if(t.dataset.yf==="pledge")p.pledge=parse(t.value);else p.name=t.value.slice(0,40);
     if(t.dataset.yf==="name")document.querySelectorAll(`.pay-payer option[value="${CSS.escape(p.id)}"]`).forEach(o=>o.textContent=p.name||"בלי שם");
     recalcPay();save()}
 });
-$("tab-pay").addEventListener("change",e=>{if(e.target.dataset.pf==="payer"||e.target.dataset.pf==="date"){const{x}=findPay(e.target);if(!x)return;x[e.target.dataset.pf]=e.target.value;recalcPay();save()}});
+$("tab-pay").addEventListener("change",e=>{const f=e.target.dataset.pf;if(f==="payer"||f==="date"){const{x}=findPay(e.target);if(!x)return;x[f]=e.target.value;document.querySelectorAll(`[data-pid="${CSS.escape(x.id)}"] [data-pf="${f}"]`).forEach(el=>{if(el!==e.target)el.value=x[f]});recalcPay();renderUpcoming();save()}else if(f==="amount"||f==="for")renderUpcoming();else if(e.target.dataset.yf==="name")renderUpcoming();else if(e.target.dataset.if==="name")renderUpcoming()});
 $("tab-pay").addEventListener("click",e=>{
   const b=e.target.closest("[data-pact],[data-yact],#add-payer");if(!b)return;
   if(b.id==="add-payer"){state.payers.push({id:uid("y"),name:"",pledge:0});renderPay();recalcPay();save();const el=document.querySelector("#payers .payer:last-child .i-name");if(el)el.focus();return}
@@ -1059,8 +1083,8 @@ const embFresh=!!EMB&&(function(){try{return localStorage.getItem("nahala-embed-
 state=normalize(embFresh?EMB.plan:readLocal());renderAll();
 window.__budget={state:()=>state,cache:cacheLocal,payCsv:()=>{
   const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
-  const rows=[["ספק","קבוצה","תאריך","סכום","מי שילם","סטטוס","הערה"]];
-  state.groups.forEach(gr=>state.items.filter(i=>i.group===gr.id).forEach(i=>i.payments.forEach(x=>rows.push([i.name,gr.name,fmtDate(x.date),x.amount,payerName(x.payer),x.paid?"שולם":"מתוכנן",x.note]))));
+  const rows=[["ספק","קבוצה","עבור","תאריך","סכום","מי שילם","סטטוס","הערה"]];
+  state.groups.forEach(gr=>state.items.filter(i=>i.group===gr.id).forEach(i=>i.payments.forEach(x=>rows.push([i.name,gr.name,x.for,fmtDate(x.date),x.amount,payerName(x.payer),x.paid?"שולם":"מתוכנן",x.note]))));
   const c=payCalc();rows.push([]);rows.push(["סיכום לפי משלם","","","שילם","מתוכנן","התחייב",""]);
   state.payers.forEach(p=>{const v=c.by[p.id]||{paid:0,sched:0};rows.push([p.name,"","",v.paid,v.sched,p.pledge||"",""])});
   rows.push([]);rows.push(["סה״כ עלות",Math.round(c.cost)]);rows.push(["סה״כ שולם",Math.round(c.paid)]);rows.push(["נשאר לשלם",Math.round(c.left)]);
