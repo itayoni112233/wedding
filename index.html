@@ -267,6 +267,23 @@ input{font:inherit;color:inherit}
 .pay-date,.pay-payer{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:6px 8px;font-size:.88rem;min-width:0;width:100%}
 .pay-row .chip{justify-self:start}
 .pay-row .pay-note{grid-column:1/-1}
+.pay-ref{grid-column:1/-1;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:6px 8px;font-size:.86rem;min-width:0;width:100%}
+.att{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.att-chip{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--paper);border-radius:99px;overflow:hidden}
+.att-open{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;font-size:.78rem;font-weight:500;color:var(--forest-2)}
+.att-open svg{width:14px;height:14px;flex:none}
+.att-x{padding:4px 9px;font-size:.8rem;color:var(--muted);border-inline-start:1px solid var(--line)}
+.att-x[data-armed]{color:var(--loss);font-weight:600}
+.att-add{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--forest-2);border:1px dashed color-mix(in srgb,var(--forest-2) 45%,transparent);border-radius:99px;padding:4px 12px;cursor:pointer}
+.att-add::before{content:"+";font-size:.95rem;line-height:1}
+.att-msg{font-size:.76rem;color:var(--muted)}
+.transfers{border-top:1px dashed var(--line);padding-top:8px}
+.transfers summary{cursor:pointer;font-size:.86rem;font-weight:600;color:var(--forest-2);padding:2px 0 8px}
+.tr-row{display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:6px 8px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:8px;margin-bottom:8px}
+.tr-row .pay-note,.tr-row .pay-ref{grid-column:1/-1}
+.tr-row .link{justify-self:end;grid-column:1/-1}
+.payer-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.payer-grid .st-cell:last-child{grid-column:auto}
 .pay-for{grid-column:1/-1;border:0;border-bottom:1px dashed var(--line);background:transparent;color:var(--ink);font-weight:600;font-size:.92rem;padding:4px 2px;min-width:0;width:100%}
 .pay-for:focus{outline:none;border-bottom-color:var(--gold)}
 .pay-for::placeholder{color:var(--faint);font-weight:500}
@@ -638,6 +655,38 @@ body:not([data-tab="budget"]) .mini-bar{display:none}
     setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);return{status:"saved"};
   }};
   window.claude={use:async n=>n==="db"?db:n==="downloads"?downloads:null};
+
+  /* קבלות ואסמכתאות: מחסן קבצים מוגן, התיקייה היא טביעת הקוד הסודי */
+  const STORE="https://odaeycwcyuqfmjrfcvtd.supabase.co/storage/v1/";
+  let folderP=null;
+  const folder=()=>folderP||(folderP=crypto.subtle.digest("SHA-256",new TextEncoder().encode(code)).then(b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")));
+  async function shrink(file){
+    if(!/^image\/(jpeg|png|webp)$/.test(file.type))return file;
+    try{
+      const bmp=await createImageBitmap(file);const k=Math.min(1,1800/Math.max(bmp.width,bmp.height));
+      if(k===1&&file.size<1.5e6)return file;
+      const c=document.createElement("canvas");c.width=Math.round(bmp.width*k);c.height=Math.round(bmp.height*k);
+      c.getContext("2d").drawImage(bmp,0,0,c.width,c.height);
+      return await new Promise(r=>c.toBlob(b=>r(b||file),"image/jpeg",.82));
+    }catch(e){return file}
+  }
+  window.weddingFiles={
+    async upload(file){
+      const f=await folder(),blob=await shrink(file);
+      const type=blob.type||file.type||"application/octet-stream";
+      const ext=type==="application/pdf"?"pdf":type==="image/png"?"png":type==="image/webp"?"webp":type==="image/heic"?"heic":"jpg";
+      const path=f+"/"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8)+"."+ext;
+      const r=await fetch(STORE+"object/receipts/"+path,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":type},body:blob});
+      if(!r.ok)throw new Error("upload "+r.status);
+      return{path,name:(file.name||("קובץ."+ext)).slice(0,80),type,size:blob.size};
+    },
+    async url(path){
+      const r=await fetch(STORE+"object/sign/receipts/"+path,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({expiresIn:3600})});
+      const j=await r.json().catch(()=>null);if(!r.ok||!j||!j.signedURL)throw new Error("sign "+r.status);
+      return STORE.replace(/\/$/,"")+j.signedURL;
+    },
+    async remove(path){try{await fetch(STORE+"object/receipts/"+path,{method:"DELETE",headers:{apikey:KEY,Authorization:"Bearer "+KEY}})}catch(e){}}
+  };
 })();
 </script>
 <script data-app>
@@ -671,6 +720,7 @@ function fromV1(s){
   if(Array.isArray(s.gifts))out.gifts=s.gifts.map((g,k)=>({id:g.id||"g"+k,label:g.label,share:+g.share||0,amount:g.linked?556:(+g.amount||0)}));
   return out;
 }
+function normFiles(a){return(Array.isArray(a)?a:[]).filter(f=>f&&f.path).map(f=>({path:String(f.path),name:String(f.name||"קובץ"),type:String(f.type||""),size:+f.size||0}))}
 function normalize(s){
   if(!s||typeof s!=="object")return emptyState();
   if(s.v!==2)return fromV1(s);
@@ -678,10 +728,10 @@ function normalize(s){
   const groups=Array.isArray(s.groups)&&s.groups.length?s.groups.slice(0,4):e.groups;
   const gids=new Set(groups.map(g=>g.id));
   return{v:2,guests:Number.isFinite(+s.guests)?+s.guests:300,reservePct:Number.isFinite(+s.reservePct)?+s.reservePct:10,groups,
-    items:(s.items||[]).map(i=>({id:i.id||uid(),group:gids.has(i.group)?i.group:groups[groups.length-1].id,name:String(i.name??""),amount:+i.amount||0,kind:KIND[i.kind]?i.kind:"fixed",base:+i.base||0,status:STATUS[i.status]?i.status:"est",on:i.on!==false,note:String(i.note??""),low:+i.low||0,high:+i.high||0,payments:(Array.isArray(i.payments)?i.payments:[]).map(x=>({id:String(x.id||uid("p")),amount:+x.amount||0,date:String(x.date||""),payer:String(x.payer||"us"),paid:x.paid!==false,for:String(x.for??""),note:String(x.note??"")}))})),
+    items:(s.items||[]).map(i=>({id:i.id||uid(),group:gids.has(i.group)?i.group:groups[groups.length-1].id,name:String(i.name??""),amount:+i.amount||0,kind:KIND[i.kind]?i.kind:"fixed",base:+i.base||0,status:STATUS[i.status]?i.status:"est",on:i.on!==false,note:String(i.note??""),low:+i.low||0,high:+i.high||0,payments:(Array.isArray(i.payments)?i.payments:[]).map(x=>({id:String(x.id||uid("p")),amount:+x.amount||0,date:String(x.date||""),payer:String(x.payer||"us"),paid:x.paid!==false,for:String(x.for??""),ref:String(x.ref??""),note:String(x.note??""),files:normFiles(x.files)}))})),
     incomes:(s.incomes||[]).map(i=>({id:i.id||uid("n"),name:String(i.name??""),amount:+i.amount||0,on:i.on!==false,note:String(i.note??"")})),
     gifts:Array.isArray(s.gifts)&&s.gifts.length?s.gifts.map(g=>({id:g.id,label:String(g.label??""),share:+g.share||0,amount:+g.amount||0})):e.gifts,
-    payers:(Array.isArray(s.payers)&&s.payers.length?s.payers:e.payers).map(x=>({id:String(x.id||uid("y")),name:String(x.name??""),pledge:+x.pledge||0}))};
+    payers:(Array.isArray(s.payers)&&s.payers.length?s.payers:e.payers).map(x=>({id:String(x.id||uid("y")),name:String(x.name??""),pledge:+x.pledge||0,transfers:(Array.isArray(x.transfers)?x.transfers:[]).map(t=>({id:String(t.id||uid("t")),date:String(t.date||""),amount:+t.amount||0,ref:String(t.ref??""),note:String(t.note??""),files:normFiles(t.files)}))}))};
 }
 
 let state=null,docRef=null,saveTimer=null,saving=false,queued=false,pendingRemote=false;
@@ -949,7 +999,9 @@ function paymentHTML(i,x){
     <div class="i-amt-wrap"><input class="i-amt" data-pf="amount" inputmode="numeric" value="${commas(x.amount)}" placeholder="0" aria-label="סכום"></div>
     <select class="pay-payer" data-pf="payer" aria-label="מי שילם">${payerOptions(x.payer)}</select>
     <button type="button" class="chip ${x.paid?"closed":"quote"}" data-pact="toggle">${x.paid?"שולם":"מתוכנן"}</button>
+    <input class="pay-ref" data-pf="ref" value="${esc(x.ref)}" placeholder="מספר אסמכתא / צ׳ק" aria-label="מספר אסמכתא">
     <input class="i-note pay-note" data-pf="note" value="${esc(x.note)}" placeholder="הערה (צ׳ק, העברה, מזומן…)" aria-label="הערה">
+    ${filesHTML(x.files,"צירוף קבלה")}
     <button type="button" class="link danger" data-pact="del">מחיקה</button>
   </div>`;
 }
@@ -973,11 +1025,24 @@ function renderPay(){
   $("payers").innerHTML=state.payers.map(p=>`<div class="payer" data-yid="${esc(p.id)}">
       <div class="payer-top"><input class="i-name" data-yf="name" value="${esc(p.name)}" placeholder="שם המשלם" aria-label="שם המשלם"><button type="button" class="link danger" data-yact="del">מחיקה</button></div>
       <div class="payer-grid">
-        <div class="st-cell"><small>שילם</small><b class="num" data-yp="${esc(p.id)}"></b></div>
-        <div class="st-cell"><small>מתוכנן</small><b class="num" data-ys="${esc(p.id)}"></b></div>
+        <div class="st-cell"><small>שילם לספקים</small><b class="num" data-yp="${esc(p.id)}"></b></div>
+        <div class="st-cell"><small>העביר אלינו</small><b class="num" data-yt="${esc(p.id)}"></b></div>
+        <div class="st-cell"><small>מתוכנן לספקים</small><b class="num" data-ys="${esc(p.id)}"></b></div>
         <div class="st-cell"><small>התחייב לתת</small><div class="i-amt-wrap"><input class="i-amt" data-yf="pledge" inputmode="numeric" value="${commas(p.pledge)}" placeholder="0" aria-label="סכום שהתחייב"></div></div>
       </div>
       <div class="payer-bal" data-yb="${esc(p.id)}"></div>
+      <details class="transfers"${p.transfers.length?" open":""}>
+        <summary>העברות כסף אלינו <span class="num">(${p.transfers.length})</span></summary>
+        ${p.transfers.map(t=>`<div class="tr-row" data-tid="${esc(t.id)}">
+          <input type="date" class="pay-date" data-tf="date" value="${esc(t.date)}" aria-label="תאריך ההעברה">
+          <div class="i-amt-wrap"><input class="i-amt" data-tf="amount" inputmode="numeric" value="${commas(t.amount)}" placeholder="0" aria-label="סכום"></div>
+          <input class="pay-ref" data-tf="ref" value="${esc(t.ref)}" placeholder="מספר אסמכתא" aria-label="מספר אסמכתא">
+          <input class="i-note pay-note" data-tf="note" value="${esc(t.note)}" placeholder="הערה (העברה בנקאית, ביט, צ׳ק…)" aria-label="הערה">
+          ${filesHTML(t.files,"צירוף אסמכתא")}
+          <button type="button" class="link danger" data-tact="del">מחיקה</button>
+        </div>`).join("")}
+        <button type="button" class="add-btn pay-add" data-tact="add">הוספת העברה</button>
+      </details>
     </div>`).join("");
 }
 function renderUpcoming(){
@@ -1010,21 +1075,62 @@ function recalcPay(){
   state.payers.forEach(p=>{
     const v=c.by[p.id]||{paid:0,sched:0};
     const set=(a,t)=>{const el=document.querySelector(`[${a}="${CSS.escape(p.id)}"]`);if(el)el.textContent=t};
-    set("data-yp",ils(v.paid));set("data-ys",ils(v.sched));
+    const tr=p.transfers.reduce((a,t)=>a+t.amount,0);
+    set("data-yp",ils(v.paid));set("data-ys",ils(v.sched));set("data-yt",ils(tr));
     const bal=document.querySelector(`[data-yb="${CSS.escape(p.id)}"]`);
     if(bal){
-      if(!p.pledge){bal.textContent=`סה״כ ${ils(v.paid+v.sched)} (שולם + מתוכנן)`;bal.className="payer-bal"}
-      else{const d=p.pledge-v.paid-v.sched;bal.textContent=d>0?`עוד ${ils(d)} עד מה שהתחייבו`:d<0?`נתנו ${ils(-d)} יותר ממה שהתחייבו`:"בדיוק לפי ההתחייבות";bal.className="payer-bal "+(d>0?"due":d<0?"over":"even")}
+      if(!p.pledge){bal.textContent=`סה״כ ${ils(v.paid+tr+v.sched)} (לספקים + אלינו + מתוכנן)`;bal.className="payer-bal"}
+      else{const d=p.pledge-v.paid-tr-v.sched;bal.textContent=d>0?`עוד ${ils(d)} עד מה שהתחייבו`:d<0?`נתנו ${ils(-d)} יותר ממה שהתחייבו`:"בדיוק לפי ההתחייבות";bal.className="payer-bal "+(d>0?"due":d<0?"over":"even")}
     }
   });
   const tot=state.payers.reduce((a,p)=>{const v=c.by[p.id]||{paid:0,sched:0};return a+v.paid},0);
-  $("payers-sum").textContent=`סה״כ שולם: ${ils(tot)}`;
+  const trs=state.payers.reduce((a,p)=>a+p.transfers.reduce((b,t)=>b+t.amount,0),0);
+  $("payers-sum").textContent=`שולם לספקים ${ils(tot)}${trs?` · הועבר אלינו ${ils(trs)}`:""}`;
 }
+const findTr=el=>{const row=el.closest("[data-tid]");const yid=el.closest("[data-yid]");if(!row||!yid)return{};const p=state.payers.find(y=>y.id===yid.dataset.yid);const t=p&&p.transfers.find(x=>x.id===row.dataset.tid);return{p,t}};
+const fileOwner=el=>{const pr=el.closest("[data-pid]");if(pr)return findPay(el).x;const tr=el.closest("[data-tid]");if(tr)return findTr(el).t;return null};
+function filesHTML(files,label){
+  const can=!!window.weddingFiles;
+  return`<div class="att">${files.map((f,k)=>`<span class="att-chip"><button type="button" class="att-open" data-open="${esc(f.path)}" title="${esc(f.name)}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 4.5 5.8 9.2a1.3 1.3 0 0 0 1.9 1.9l5-5a2.6 2.6 0 0 0-3.7-3.7l-5 5a3.9 3.9 0 0 0 5.5 5.5l4.3-4.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>${esc(f.name.length>22?f.name.slice(0,20)+"…":f.name)}</button>${can?`<button type="button" class="att-x" data-rmfile="${k}" aria-label="הסרת הקובץ">×</button>`:""}</span>`).join("")}${can?`<label class="att-add">${label}<input type="file" accept="image/*,application/pdf" data-upload hidden></label>`:""}<span class="att-msg" role="status"></span></div>`;
+}
+$("tab-pay").addEventListener("change",async e=>{
+  const inp=e.target;if(!inp.matches("[data-upload]")||!inp.files||!inp.files[0])return;
+  const owner=fileOwner(inp);if(!owner||!window.weddingFiles)return;
+  const msg=inp.closest(".att").querySelector(".att-msg");const file=inp.files[0];inp.value="";
+  if(file.size>25e6){msg.textContent="הקובץ גדול מדי (עד 25MB).";return}
+  msg.textContent="מעלה…";
+  try{const f=await window.weddingFiles.upload(file);owner.files.push(f);renderPay();recalcPay();save()}
+  catch(err){msg.textContent="ההעלאה נכשלה, נסו שוב."}
+});
+$("tab-pay").addEventListener("click",async e=>{
+  const o=e.target.closest("[data-open]");
+  if(o){e.preventDefault();if(!window.weddingFiles)return;
+    const w=window.open("","_blank");
+    try{const u=await window.weddingFiles.url(o.dataset.open);if(w)w.location.href=u;else location.href=u}
+    catch(err){if(w)w.close();const m=o.closest(".att").querySelector(".att-msg");if(m)m.textContent="לא הצלחתי לפתוח את הקובץ."}
+    return}
+  const rm=e.target.closest("[data-rmfile]");
+  if(rm){const owner=fileOwner(rm);if(!owner)return;
+    if(!rm.dataset.armed){rm.dataset.armed="1";rm.textContent="למחוק?";setTimeout(()=>{if(rm.isConnected){delete rm.dataset.armed;rm.textContent="×"}},3000);return}
+    const f=owner.files[+rm.dataset.rmfile];if(!f)return;owner.files=owner.files.filter(x=>x!==f);
+    if(window.weddingFiles)window.weddingFiles.remove(f.path);renderPay();recalcPay();save();return}
+  const ta=e.target.closest("[data-tact]");
+  if(ta){const yid=ta.closest("[data-yid]");const p=yid&&state.payers.find(y=>y.id===yid.dataset.yid);if(!p)return;
+    if(ta.dataset.tact==="add"){const t={id:uid("t"),date:todayISO(),amount:0,ref:"",note:"",files:[]};p.transfers.push(t);renderPay();recalcPay();save();
+      const el=document.querySelector(`[data-tid="${CSS.escape(t.id)}"] .i-amt`);if(el)el.focus();return}
+    const{t}=findTr(ta);if(!t)return;
+    armDelete(ta,()=>{t.files.forEach(f=>window.weddingFiles&&window.weddingFiles.remove(f.path));p.transfers=p.transfers.filter(x=>x!==t);renderPay();recalcPay();save()})}
+});
+$("tab-pay").addEventListener("input",e=>{
+  const f=e.target.dataset.tf;if(!f)return;const{t}=findTr(e.target);if(!t)return;
+  if(f==="amount")t.amount=parse(e.target.value);else if(f==="date")t.date=e.target.value;else if(f==="ref")t.ref=e.target.value.slice(0,60);else t.note=e.target.value.slice(0,200);
+  recalcPay();save();
+});
 const findPay=el=>{const row=el.closest("[data-pid]");if(!row)return{};const it=state.items.find(i=>i.id===row.dataset.item);const x=it&&it.payments.find(p=>p.id===row.dataset.pid);return{row,it,x}};
 $("tab-pay").addEventListener("input",e=>{
   const t=e.target;
   if(t.dataset.pf){const{x}=findPay(t);if(!x)return;const f=t.dataset.pf;
-    if(f==="amount")x.amount=parse(t.value);else if(f==="for")x.for=t.value.slice(0,80);else if(f==="note")x.note=t.value.slice(0,200);else if(f==="date")x.date=t.value;else if(f==="payer")x.payer=t.value;
+    if(f==="amount")x.amount=parse(t.value);else if(f==="for")x.for=t.value.slice(0,80);else if(f==="ref")x.ref=t.value.slice(0,60);else if(f==="note")x.note=t.value.slice(0,200);else if(f==="date")x.date=t.value;else if(f==="payer")x.payer=t.value;
     document.querySelectorAll(`[data-pid="${CSS.escape(x.id)}"] [data-pf="${f}"]`).forEach(el=>{if(el!==t)el.value=f==="amount"?commas(x.amount):(x[f]??"")});
     recalcPay();save();return}
   if(t.dataset.if){const it=state.items.find(i=>i.id===t.closest(".pay-item").dataset.item);if(!it)return;
@@ -1083,10 +1189,12 @@ const embFresh=!!EMB&&(function(){try{return localStorage.getItem("nahala-embed-
 state=normalize(embFresh?EMB.plan:readLocal());renderAll();
 window.__budget={state:()=>state,cache:cacheLocal,payCsv:()=>{
   const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
-  const rows=[["ספק","קבוצה","עבור","תאריך","סכום","מי שילם","סטטוס","הערה"]];
-  state.groups.forEach(gr=>state.items.filter(i=>i.group===gr.id).forEach(i=>i.payments.forEach(x=>rows.push([i.name,gr.name,x.for,fmtDate(x.date),x.amount,payerName(x.payer),x.paid?"שולם":"מתוכנן",x.note]))));
+  const rows=[["ספק","קבוצה","עבור","תאריך","סכום","מי שילם","סטטוס","אסמכתא","קבצים","הערה"]];
+  state.groups.forEach(gr=>state.items.filter(i=>i.group===gr.id).forEach(i=>i.payments.forEach(x=>rows.push([i.name,gr.name,x.for,fmtDate(x.date),x.amount,payerName(x.payer),x.paid?"שולם":"מתוכנן",x.ref,x.files.length||"",x.note]))));
   const c=payCalc();rows.push([]);rows.push(["סיכום לפי משלם","","","שילם","מתוכנן","התחייב",""]);
   state.payers.forEach(p=>{const v=c.by[p.id]||{paid:0,sched:0};rows.push([p.name,"","",v.paid,v.sched,p.pledge||"",""])});
+  rows.push([]);rows.push(["העברות כסף אלינו","משלם","","תאריך","סכום","","","אסמכתא","קבצים","הערה"]);
+  state.payers.forEach(p=>p.transfers.forEach(t=>rows.push(["",p.name,"",fmtDate(t.date),t.amount,"","",t.ref,t.files.length||"",t.note])));
   rows.push([]);rows.push(["סה״כ עלות",Math.round(c.cost)]);rows.push(["סה״כ שולם",Math.round(c.paid)]);rows.push(["נשאר לשלם",Math.round(c.left)]);
   return "﻿"+rows.map(r=>r.map(q).join(",")).join("\r\n");
 },csv:()=>{
