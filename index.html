@@ -713,7 +713,7 @@ const parse=s=>{const d=String(s).replace(/[^\d]/g,"");return d?Math.min(1e9,par
 const uid=p=>(p||"i")+Math.random().toString(36).slice(2,9);
 
 /* ---------- state ---------- */
-function emptyState(){return{v:2,guests:300,reservePct:10,groups:DEFAULT_GROUPS.map(g=>({...g})),items:[],incomes:[],gifts:DEFAULT_GIFTS.map(g=>({...g})),payers:DEFAULT_PAYERS.map(p=>({...p}))}}
+function emptyState(){return{v:2,guests:300,reservePct:10,groups:DEFAULT_GROUPS.map(g=>({...g})),items:[],incomes:[],gifts:DEFAULT_GIFTS.map(g=>({...g})),payers:DEFAULT_PAYERS.map(p=>({...p,transfers:[]}))}}
 function fromV1(s){
   const out=emptyState();out.guests=+s.guests||300;out.reservePct=+s.reservePct||10;
   const v=s.venue||{};
