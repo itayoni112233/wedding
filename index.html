@@ -355,6 +355,33 @@ details[open]>summary .chev{transform:rotate(-90deg)}
 .up-amt{font-weight:700;font-size:.9rem}
 .up-mark{font-size:.72rem;font-weight:600;color:var(--gain);border:1px solid color-mix(in srgb,var(--gain) 40%,transparent);border-radius:99px;padding:3px 9px}
 
+
+/* budget folders */
+.bgroup>summary,.bi>summary{list-style:none;cursor:pointer}
+.bgroup>summary::-webkit-details-marker,.bi>summary::-webkit-details-marker{display:none}
+.bg-sum{display:flex;align-items:center;gap:12px;padding:16px}
+.bg-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.bg-t b{font-family:var(--f-display);font-weight:400;font-size:1.4rem;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bg-t small{font-size:.74rem;color:var(--muted)}
+.bg-body{border-top:1px solid var(--line)}
+.g-name-edit{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:.78rem;color:var(--muted)}
+.g-name-edit input{flex:1;min-width:0;border:0;border-bottom:1px dashed var(--line);background:transparent;font-family:var(--f-display);font-size:1.1rem;color:var(--ink);padding:2px 0}
+.g-name-edit input:focus{outline:none;border-bottom-color:var(--gold)}
+.bi{border-top:1px solid var(--line)}
+.bi-sum{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:3px 10px;align-items:center;padding:11px 16px}
+.bi-sum:hover{background:color-mix(in srgb,var(--paper-2) 60%,transparent)}
+.bi-name{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bi-amt{font-weight:700}
+.bi-tags{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.bi-tags:empty{display:none}
+.bi-st{font-size:.68rem;font-weight:600;padding:1px 8px;border-radius:99px;border:1px dashed var(--line);color:var(--muted)}
+.bi-st.quote{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.bi-st.closed{background:var(--gain-soft);color:var(--gain);border-color:transparent}
+.bi-off{font-size:.68rem;color:var(--faint)}
+.bi-sum.off .bi-name,.bi-sum.off .bi-amt{opacity:.5;text-decoration:line-through}
+.bi>.item{border-top:1px dashed var(--line);background:var(--paper-2)}
+.bi-sum .chev{grid-row:1;grid-column:3}
+
 /* tabs */
 .tabs{display:flex;gap:4px;background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:4px;align-self:center;box-shadow:var(--shadow)}
 .tabs button{padding:8px 24px;border-radius:99px;font-weight:600;font-size:.95rem;color:var(--muted)}
@@ -838,10 +865,25 @@ function calc(){
 }
 
 /* ---------- render ---------- */
+const BOPEN={groups:new Set(),items:new Set()};
+const BCHEV='<svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 4 6 8l4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function updBudgetRows(){
+  const g=Math.max(0,state.guests|0);
+  state.items.forEach(i=>{
+    const c=document.querySelector(`[data-bc="${CSS.escape(i.id)}"]`);if(c)c.textContent=ils(lineCost({...i,on:true},g));
+    const st=document.querySelector(`[data-bs="${CSS.escape(i.id)}"]`);if(st){st.textContent=STATUS[i.status];st.className="bi-st "+i.status}
+  });
+  state.incomes.forEach(i=>{const c=document.querySelector(`[data-bc="${CSS.escape(i.id)}"]`);if(c)c.textContent=ils(i.amount)});
+  state.groups.forEach(gr=>{const n=state.items.filter(i=>i.group===gr.id).length;const el=document.querySelector(`[data-gsub="${gr.id}"]`);
+    if(el){const cu=document.querySelector(`[data-cu="${gr.id}"]`),sh=document.querySelector(`[data-sh="${gr.id}"]`);el.textContent=`${n} הוצאות · לראש ${sh?sh.textContent:""} · מצטבר ${cu?cu.textContent:""}`}});
+}
 function itemHTML(i){
   const calcline=i.kind==="perGuest"?`<span class="calcline">לכל אורח · <span class="num" data-cl="${i.id}"></span></span>`
     :i.kind==="extraGuest"?`<span class="calcline">מעל <input class="num" data-f="base" inputmode="numeric" value="${i.base||""}" aria-label="אורחי בסיס"> אורחים · <span class="num" data-cl="${i.id}"></span></span>`:"";
-  return`<div class="item${i.on?"":" off"}" data-id="${i.id}">
+  return`<details class="bi" data-bid="${i.id}"${BOPEN.items.has(i.id)?" open":""}>
+    <summary class="bi-sum${i.on?"":" off"}"><span class="bi-name" data-bn="${i.id}">${esc(i.name||"בלי שם")}</span><span class="bi-amt num" data-bc="${i.id}"></span>
+      <span class="bi-tags"><span class="bi-st ${i.status}" data-bs="${i.id}">${STATUS[i.status]}</span><span class="paid-chip" data-pc="${i.id}"></span>${i.on?"":'<span class="bi-off">לא בחשבון</span>'}</span>${BCHEV}</summary>
+    <div class="item${i.on?"":" off"}" data-id="${i.id}">
     <div class="i-row">
       <input class="i-name" data-f="name" value="${esc(i.name)}" placeholder="שם ההוצאה" aria-label="שם ההוצאה">
       <div class="i-amt-wrap"><input class="i-amt" data-f="amount" inputmode="numeric" value="${commas(i.amount)}" placeholder="0" aria-label="סכום"></div>
@@ -850,15 +892,17 @@ function itemHTML(i){
       <button type="button" class="chip ${i.status}" data-act="status" title="הקישו לשינוי">${STATUS[i.status]}</button>
       <button type="button" class="chip kind" data-act="kind" title="הקישו לשינוי">${KIND[i.kind]}</button>
       ${calcline}
-      ${i.low||i.high?`<span class="range num">שוק ${nf.format(i.low)}–${nf.format(i.high)}</span>`:""}<span class="paid-chip" data-pc="${i.id}"></span>
+      ${i.low||i.high?`<span class="range num">שוק ${nf.format(i.low)}–${nf.format(i.high)}</span>`:""}
     </div>
     <div class="i-meta">
       <input class="i-note" data-f="note" value="${esc(i.note)}" placeholder="הערה, שם ספק, טלפון…" aria-label="הערה">
       <span class="acts"><button type="button" class="link" data-act="toggle">${i.on?"להוציא מהחשבון":"להחזיר"}</button><button type="button" class="link danger" data-act="del">מחיקה</button></span>
-    </div></div>`;
+    </div></div></details>`;
 }
 function incomeHTML(i){
-  return`<div class="item${i.on?"":" off"}" data-inc="${i.id}">
+  return`<details class="bi" data-bid="${i.id}"${BOPEN.items.has(i.id)?" open":""}>
+    <summary class="bi-sum${i.on?"":" off"}"><span class="bi-name" data-bn="${i.id}">${esc(i.name||"בלי שם")}</span><span class="bi-amt num" data-bc="${i.id}"></span>${i.on?"":'<span class="bi-tags"><span class="bi-off">לא בחשבון</span></span>'}${BCHEV}</summary>
+    <div class="item${i.on?"":" off"}" data-inc="${i.id}">
     <div class="i-row">
       <input class="i-name" data-f="name" value="${esc(i.name)}" placeholder="שם ההכנסה" aria-label="שם ההכנסה">
       <div class="i-amt-wrap"><input class="i-amt" data-f="amount" inputmode="numeric" value="${commas(i.amount)}" placeholder="0" aria-label="סכום"></div>
@@ -866,17 +910,19 @@ function incomeHTML(i){
     <div class="i-meta">
       <input class="i-note" data-f="note" value="${esc(i.note)}" placeholder="הערה" aria-label="הערה">
       <span class="acts"><button type="button" class="link" data-act="toggle">${i.on?"להוציא מהחשבון":"להחזיר"}</button><button type="button" class="link danger" data-act="del">מחיקה</button></span>
-    </div></div>`;
+    </div></div></details>`;
 }
 function renderGroups(){
   $("groups").innerHTML=state.groups.map((gr,k)=>{
     const its=state.items.filter(i=>i.group===gr.id);
-    return`<section class="group" data-gid="${gr.id}" style="margin-bottom:16px">
-      <div class="g-head">
+    return`<details class="group bgroup" data-gid="${gr.id}" style="margin-bottom:16px"${BOPEN.groups.has(gr.id)?" open":""}>
+      <summary class="bg-sum">
         <div class="letter" aria-hidden="true">${LETTERS[k]}</div>
-        <div class="g-title"><input data-gname value="${esc(gr.name)}" aria-label="שם הקבוצה"><small>${its.length} שורות</small></div>
-        <div class="g-amt num" data-gt="${gr.id}"></div>
-      </div>
+        <div class="bg-t"><b data-gtitle="${gr.id}">${esc(gr.name)}</b><small data-gsub="${gr.id}"></small></div>
+        <div class="g-amt num" data-gt="${gr.id}"></div>${BCHEV}
+      </summary>
+      <div class="bg-body">
+      <div class="g-name-edit"><label for="gname-${gr.id}">שם הקבוצה</label><input id="gname-${gr.id}" data-gname value="${esc(gr.name)}"></div>
       ${its.map(itemHTML).join("")||`<div class="item" style="color:var(--muted);font-size:.88rem">אין עדיין הוצאות בקבוצה הזו.</div>`}
       <div class="add-row"><button type="button" class="add-btn" data-add="${gr.id}">הוספת הוצאה</button></div>
       <div class="subtotal">
@@ -888,7 +934,8 @@ function renderGroups(){
         <div class="cum-bar" aria-hidden="true"><i data-cb="${gr.id}"></i></div>
         <div style="font-size:.74rem;color:var(--muted)" data-ct="${gr.id}"></div>
       </div>
-    </section>`;
+      </div>
+    </details>`;
   }).join("");
 }
 function renderIncomes(){$("incomes").innerHTML=state.incomes.map(incomeHTML).join("")}
@@ -963,7 +1010,7 @@ function recalc(){
         :ins("מתחת לבסיס",`אתם מתחת ל-${c.extra.base} אורחים ומשלמים על החבילה המלאה בכל מקרה. עד ${c.extra.base}, אורח נוסף לא עולה כלום במקום ומביא בממוצע <b class="num">${ils(c.avg)}</b>.`));
     }
   }
-  $("insights").innerHTML=out.join("");updHint();recalcPay();
+  $("insights").innerHTML=out.join("");updHint();recalcPay();updBudgetRows();
 }
 
 /* ---------- events ---------- */
@@ -981,12 +1028,13 @@ function armDelete(b,doIt){
 }
 function fieldInput(obj,f,el){
   if(f==="amount"||f==="base"){obj[f]=parse(el.value);recalc();const pw=obj.id&&document.querySelector(`#pay-items [data-item="${CSS.escape(obj.id)}"] [data-if="amount"]`);if(pw&&f==="amount")pw.value=commas(obj.amount)}
-  else obj[f]=el.value.slice(0,f==="note"?240:80);if(f==="name"&&obj.id){const pw=document.querySelector(`#pay-items [data-item="${CSS.escape(obj.id)}"] [data-if="name"]`);if(pw)pw.value=obj.name}
+  else obj[f]=el.value.slice(0,f==="note"?240:80);if(f==="name"&&obj.id){const bn=document.querySelector(`[data-bn="${CSS.escape(obj.id)}"]`);if(bn)bn.textContent=obj.name||"בלי שם"}
+  if(f==="name"&&obj.id){const pw=document.querySelector(`#pay-items [data-item="${CSS.escape(obj.id)}"] [data-if="name"]`);if(pw)pw.value=obj.name}
   save();
 }
 $("groups").addEventListener("input",e=>{
   const t=e.target;
-  if(t.hasAttribute("data-gname")){const gr=state.groups.find(g=>g.id===t.closest("[data-gid]").dataset.gid);gr.name=t.value.slice(0,40);
+  if(t.hasAttribute("data-gname")){const gr=state.groups.find(g=>g.id===t.closest("[data-gid]").dataset.gid);gr.name=t.value.slice(0,40);{const tt=document.querySelector(`[data-gtitle="${gr.id}"]`);if(tt)tt.textContent=gr.name||"בלי שם"}
     const st=document.querySelector(`[data-st="${gr.id}"]`);if(st)st.previousElementSibling.textContent="סה״כ "+gr.name;recalc();save();return}
   const row=t.closest("[data-id]");if(!row||!t.dataset.f)return;
   const it=state.items.find(i=>i.id===row.dataset.id);if(it)fieldInput(it,t.dataset.f,t);
@@ -994,7 +1042,7 @@ $("groups").addEventListener("input",e=>{
 $("groups").addEventListener("click",e=>{
   const add=e.target.closest("[data-add]");
   if(add){const it={id:uid(),group:add.dataset.add,name:"",amount:0,kind:"fixed",base:0,status:"est",on:true,note:"",low:0,high:0};
-    state.items.push(it);renderGroups();renderPay();recalc();save();const el=document.querySelector(`[data-id="${it.id}"] .i-name`);if(el)el.focus();return}
+    BOPEN.items.add(it.id);BOPEN.groups.add(it.group);state.items.push(it);renderGroups();renderPay();recalc();save();const el=document.querySelector(`[data-id="${it.id}"] .i-name`);if(el)el.focus();return}
   const b=e.target.closest("[data-act]");if(!b)return;
   const row=b.closest("[data-id]");const it=state.items.find(i=>i.id===row.dataset.id);if(!it)return;
   const a=b.dataset.act;
@@ -1014,7 +1062,7 @@ $("incomes").addEventListener("click",e=>{
   else if(b.dataset.act==="del")armDelete(b,()=>{state.incomes=state.incomes.filter(i=>i!==it);renderIncomes();recalc();save()});
 });
 $("add-income").addEventListener("click",()=>{
-  const it={id:uid("n"),name:"",amount:0,on:true,note:""};state.incomes.push(it);renderIncomes();recalc();save();
+  const it={id:uid("n"),name:"",amount:0,on:true,note:""};BOPEN.items.add(it.id);state.incomes.push(it);renderIncomes();recalc();save();
   const el=document.querySelector(`[data-inc="${it.id}"] .i-name`);if(el)el.focus();
 });
 $("gift-rows").addEventListener("input",e=>{
@@ -1027,6 +1075,12 @@ document.addEventListener("focusout",e=>{
   if(t.classList&&(t.classList.contains("i-amt")||t.classList.contains("g-amt"))&&t.tagName==="INPUT"){const n=parse(t.value);t.value=commas(n)}
   setTimeout(()=>{if(pendingRemote&&!editing())renderAll()},0);
 });
+
+["groups","incomes"].forEach(id=>$(id).addEventListener("toggle",e=>{
+  const d=e.target;if(!d.matches)return;
+  if(d.matches(".bgroup"))d.open?BOPEN.groups.add(d.dataset.gid):BOPEN.groups.delete(d.dataset.gid);
+  else if(d.matches(".bi"))d.open?BOPEN.items.add(d.dataset.bid):BOPEN.items.delete(d.dataset.bid);
+},true));
 
 /* ---------- payments ---------- */
 const fmtDate=d=>{if(!d)return"בלי תאריך";const[y,m,dd]=d.split("-");return dd&&m?`${+dd}.${+m}.${y}`:d};
