@@ -1186,7 +1186,7 @@ function recalcPay(){
     set("data-yp",ils(v.paid));set("data-ys",ils(v.sched));set("data-yt",ils(tr));
     const bal=document.querySelector(`[data-yb="${CSS.escape(p.id)}"]`);
     if(bal){
-      if(!p.pledge){bal.textContent=`סה״כ ${ils(v.paid+tr+v.sched)} (לספקים + אלינו + מתוכנן)`;bal.className="payer-bal"}
+      if(!p.pledge){bal.textContent=v.sched?`ועוד ${ils(v.sched)} מתוכנן`:"";bal.className="payer-bal"}
       else{const d=p.pledge-v.paid-tr-v.sched;bal.textContent=d>0?`עוד ${ils(d)} עד מה שהתחייבו`:d<0?`נתנו ${ils(-d)} יותר ממה שהתחייבו`:"בדיוק לפי ההתחייבות";bal.className="payer-bal "+(d>0?"due":d<0?"over":"even")}
     }
   });
