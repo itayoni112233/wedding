@@ -1,0 +1,420 @@
+<!doctype html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>איתי ועומר מתחתנים</title>
+<meta name="description" content="החתונה של איתי ועומר, 30.04.2027, הנחלה. השאירו תמונות וברכות לזוג.">
+<meta property="og:title" content="החתונה של איתי ועומר">
+<meta property="og:description" content="30.04.2027 · הנחלה. השאירו לזוג תמונות וברכות.">
+<meta name="theme-color" content="#55693F">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Assistant:wght@400;600;700&display=swap">
+<style>
+/* Layout: one narrow phone column, olive-garden palette, invitation-style serif headings */
+:root{
+  --bg:#F3F4EE; --surface:#FFFFFF; --soft:#E6E9DD; --line:#D5DAC8;
+  --ink:#24301F; --muted:#66705E; --accent:#55693F; --accent-ink:#FFFFFF; --gold:#B0904F;
+  --display:"Frank Ruhl Libre","David",Georgia,serif;
+  --body:"Assistant","Arial Hebrew",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#151A13; --surface:#1E251B; --soft:#28311F; --line:#374230;
+  --ink:#ECEFE4; --muted:#A6AE9C; --accent:#A9C08A; --accent-ink:#151A13; --gold:#D5B877; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#151A13; --surface:#1E251B; --soft:#28311F; --line:#374230;
+  --ink:#ECEFE4; --muted:#A6AE9C; --accent:#A9C08A; --accent-ink:#151A13; --gold:#D5B877; color-scheme:dark}
+html,body{direction:rtl}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:440px;margin-inline:auto;padding-block:24px 110px;display:flex;flex-direction:column;gap:20px;text-align:start}
+h1,h2,h3{font-family:var(--display);font-weight:500;margin:0;text-wrap:balance;line-height:1.2}
+h1{font-size:2.1rem;text-align:center}
+h2{font-size:1.45rem}
+h3{font-size:1.2rem}
+p{margin:0}
+.num{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.center{text-align:center}
+.eyebrow{display:flex;justify-content:center;align-items:center;gap:8px;color:var(--muted);letter-spacing:.04em;font-size:.95rem}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block}
+.live .dot{background:#4CAF50;box-shadow:0 0 0 0 rgba(76,175,80,.5);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(76,175,80,0)}100%{box-shadow:0 0 0 0 rgba(76,175,80,0)}}
+.pill{display:flex;align-items:center;justify-content:center;gap:14px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 20px;margin-inline:auto;flex-wrap:wrap}
+.pill .clock{font-family:var(--display);font-size:1.5rem;color:var(--accent)}
+.pill .sep{width:1px;height:24px;background:var(--line)}
+.photo{width:min(260px,80%);aspect-ratio:4/5;margin-inline:auto;border-radius:22px;background:var(--surface);padding:8px;border:1px solid var(--line);box-shadow:0 10px 30px rgba(36,48,31,.10);max-width:100%}
+.photo-in{width:100%;height:100%;border-radius:16px;background:linear-gradient(160deg,var(--soft),var(--line));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background-size:cover;background-position:center;cursor:pointer;color:var(--muted);font-size:.9rem;text-align:center}
+.photo-in b{font-family:var(--display);font-weight:500;font-size:2rem;color:var(--accent)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px}
+label.q{font-family:var(--display);font-size:1.3rem;white-space:nowrap}
+.row{display:flex;gap:10px;align-items:center}
+input[type=text],textarea{width:100%;box-sizing:border-box;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px 14px;text-align:start;min-width:0}
+textarea{min-height:110px;resize:vertical}
+input:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{font:inherit;font-weight:700;border:0;border-radius:14px;padding:13px 18px;background:var(--accent);color:var(--accent-ink);cursor:pointer;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line);font-weight:600}
+.fine{font-size:.8rem;color:var(--muted)}
+/* home */
+.hero{display:flex;flex-direction:column;gap:6px}
+.hero h1{text-align:start;font-size:1.9rem}
+.hello b{color:var(--accent)}
+.ticker{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:10px 16px;overflow:hidden;white-space:nowrap}
+.ticker .msg{color:var(--muted);overflow:hidden;text-overflow:ellipsis;transition:opacity .4s}
+.count{display:grid;grid-template-columns:repeat(4,1fr);text-align:center}
+.count div+div{border-inline-start:1px solid var(--line)}
+.count b{display:block;font-family:var(--display);font-weight:500;font-size:1.9rem;color:var(--accent)}
+.count span{font-size:.8rem;color:var(--muted)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions .wide{grid-column:1/-1}
+.stories{display:flex;gap:14px;overflow-x:auto;padding-block:4px 8px;scrollbar-width:none}
+.story{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.85rem;background:none;border:0;color:var(--ink);font-family:inherit;cursor:pointer;padding:0}
+.ring{width:64px;height:64px;border-radius:50%;border:2px solid var(--gold);padding:3px;box-sizing:border-box}
+.ring i{display:flex;width:100%;height:100%;border-radius:50%;background:var(--soft) center/cover;align-items:center;justify-content:center;font-style:normal;font-family:var(--display);font-size:1.3rem;color:var(--accent)}
+.ring.add{border:2px dashed var(--line)}
+.ring.add i{background:none;font-size:1.8rem;color:var(--muted)}
+.feat{display:grid;grid-template-columns:44px 1fr;gap:14px;padding-block:16px;border-top:1px solid var(--line)}
+.feat:first-of-type{border-top:0;padding-top:4px}
+.ico{width:44px;height:44px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.ico svg{width:22px;height:22px}
+.feat>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.link{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--accent);cursor:pointer;text-align:start;margin-top:4px}
+.stat{font-size:.85rem;color:var(--muted)}
+/* sub screens */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.back{background:none;border:0;font:inherit;font-weight:700;color:var(--accent);cursor:pointer;padding:6px 0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.grid img,.grid .ph{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;display:block;max-width:100%}
+.ph{background:var(--soft);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.75rem;text-align:center}
+.drop{border:2px dashed var(--line);border-radius:18px;padding:22px;text-align:center;cursor:pointer;display:flex;flex-direction:column;gap:6px;align-items:center}
+.chips{display:flex;flex-direction:column;gap:8px}
+.chip{font:inherit;text-align:start;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:12px 18px;cursor:pointer;color:var(--ink)}
+.chat{display:flex;flex-direction:column;gap:10px}
+.bub{max-width:85%;padding:10px 14px;border-radius:16px;white-space:pre-wrap}
+.bub.me{align-self:flex-start;background:var(--accent);color:var(--accent-ink);border-end-start-radius:4px}
+.bub.them{align-self:flex-end;background:var(--surface);border:1px solid var(--line);border-end-end-radius:4px}
+.wish{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:4px}
+.wish:first-child{border-top:0;padding-top:0}
+.wish b{font-weight:700}
+canvas{width:100%;height:auto;border-radius:16px;display:block;max-width:100%}
+.float{position:fixed;inset-inline-start:max(16px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));width:56px;height:56px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.float svg{width:30px;height:30px}
+.modal{position:fixed;inset:0;background:rgba(20,26,18,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:5}
+.invite{background:var(--surface);border-radius:22px;max-width:380px;width:100%;padding:34px 24px;text-align:center;display:flex;flex-direction:column;gap:12px;border:1px solid var(--gold)}
+.invite .names{font-family:var(--display);font-size:2.3rem;color:var(--accent);line-height:1.1}
+.invite hr{border:0;border-top:1px solid var(--gold);width:60px;margin:4px auto}
+.foot{text-align:center;font-size:.8rem;color:var(--muted)}
+.demo{background:var(--soft);border-radius:12px;padding:10px 14px;font-size:.85rem;color:var(--muted)}
+.fade{animation:fade .5s ease both}
+@keyframes fade{from{transform:translateY(8px)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.tile{padding:0;border:0;background:none;position:relative;cursor:pointer;display:block}
+.tile img,.tile video{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;display:block;max-width:100%;background:var(--soft)}
+.play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.6rem;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.viewer{width:100%;max-width:520px;display:flex;flex-direction:column;gap:10px}
+.vbox img,.vbox video{width:100%;max-height:72vh;object-fit:contain;border-radius:14px;display:block;background:#000}
+.vbar{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#fff;font-weight:700}
+.toast{position:fixed;inset-inline:max(16px,env(safe-area-inset-left,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));max-width:420px;margin-inline:auto;background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:14px;text-align:center;z-index:9;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.arow{display:flex;align-items:center;gap:10px;border-top:1px solid var(--line);padding-top:10px}
+.arow img{width:56px;height:56px;object-fit:cover;border-radius:10px;flex:0 0 auto}
+.arow.off{opacity:.45}
+.arow .btn{padding:8px 12px;flex:0 0 auto}
+</style>
+</head>
+<body>
+<div class="wrap" dir="rtl" id="app"></div>
+<input type="file" id="pick" accept="image/*,video/*" multiple hidden>
+<input type="file" id="pickSelfie" accept="image/*" capture="user" hidden>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+/* ===== פרטי האירוע — לשנות כאן ===== */
+const EV = {
+  groom:"איתי", bride:"עומר",
+  start:new Date("2027-04-30T12:00:00+03:00"),
+  venue:"הנחלה",
+  phone:"",                       // מספר וואטסאפ לפניות, למשל 972501234567
+  couplePhoto:"couple.jpg",       // תמונת הזוג: קובץ בתיקייה הזו
+  qa:[
+    {k:["הכירו","הכרתם","פגשו"], q:"איך איתי ועומר הכירו?", a:"את הסיפור המלא נספר לכם בחתונה 😉"},
+    {k:["הצעה","הציע"], q:"איפה הייתה ההצעה?", a:"גם את זה נספר בחתונה."},
+    {k:["מתי","שעה","תאריך","יום"], q:"מתי מתחיל האירוע?", a:"יום שישי, 30 באפריל 2027. קבלת פנים ב־12:00."},
+    {k:["איפה","מקום","כתובת","הגעה","חניה","חנייה"], q:"איך מגיעים?", a:"האירוע בהנחלה. יש כפתור ניווט ב־Waze במסך הראשי."},
+    {k:["לבוש","ללבוש","דרס"], q:"מה לובשים?", a:"חגיגי וקליל. כדאי נעליים נוחות."}
+  ]
+};
+/* =================================== */
+
+const SB="https://odaeycwcyuqfmjrfcvtd.supabase.co";
+const KEY="sb_publishable_htI8j-LrIQpAtBfEu6J5tg_DFonLe2V";
+const PUB=SB+"/storage/v1/object/public/guests/";
+
+const $=s=>document.querySelector(s);
+const app=$("#app");
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+
+async function rpc(fn,body={}){
+  const r=await fetch(SB+"/rest/v1/rpc/"+fn,{method:"POST",headers:{apikey:KEY,"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>null);
+  if(!r.ok)throw new Error(j&&j.message||"error");
+  return j;
+}
+
+let S={name:ls.get("guest-name",""),feed:{media:[],wishes:[],questions:0,guests:0},chat:[],screen:"home",coupleOk:false};
+const adminCode=ls.get("nahala-code",null);
+
+async function load(){try{S.feed=await rpc("guest_feed")}catch(e){}}
+function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,3500)}
+
+const ICON={
+ album:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="15" height="14" rx="2"/><path d="M7 3h12a2 2 0 0 1 2 2v12"/><circle cx="8.5" cy="10" r="1.5"/><path d="m3 17 4-4 4 4 3-3 4 4"/></svg>',
+ chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h16v11H9l-5 4z"/></svg>',
+ heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg>',
+ cam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+ pin:'<svg viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-6-6-6-11a6 6 0 0 1 12 0c0 5-6 11-6 11z"/><circle cx="12" cy="10" r="2"/></svg>',
+ mail:'<svg viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+ cal:'<svg viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+ wa:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l2 1c.3.1.5.2.5.3.1.2.1.6-.1 1.2z"/></svg>'
+};
+
+const dateStr=()=>EV.start.toLocaleDateString("he-IL",{weekday:"long",day:"numeric",month:"long",timeZone:"Asia/Jerusalem"});
+const timeStr=()=>EV.start.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Jerusalem"});
+function left(){let ms=Math.max(0,EV.start-Date.now());const d=Math.floor(ms/864e5);ms-=d*864e5;const h=Math.floor(ms/36e5);ms-=h*36e5;const m=Math.floor(ms/6e4);const s=Math.floor((ms-m*6e4)/1e3);return{d,h,m,s}}
+const pad=n=>String(n).padStart(2,"0");
+const plural=(n,one,many)=>n===1?one:`${n} ${many}`;
+
+/* תמונת הזוג: אם יש קובץ couple.jpg בתיקייה הוא מוצג, אחרת השמות */
+const coupleImg=new Image();coupleImg.onload=()=>{S.coupleOk=true;const el=$("#cphoto");if(el){el.style.backgroundImage=`url('${EV.couplePhoto}')`;el.innerHTML=""}};coupleImg.src=EV.couplePhoto;
+
+/* ---------- מסך כניסה ---------- */
+function entry(){
+  S.screen="entry";
+  const g=S.feed.guests;
+  app.innerHTML=`
+  <div class="eyebrow fade"><span class="dot"></span> מחכים לכם</div>
+  <h1 class="fade">החתונה של ${EV.groom} ו${EV.bride}</h1>
+  ${g?`<p class="center muted">${g===1?"אורח אחד כבר השאיר":`<span class="num">${g}</span> אורחים כבר השאירו`} מזכרת לזוג. הצטרפו!</p>`:`<p class="center muted">השאירו לזוג תמונות וברכות לפני החתונה ובזמן החתונה.</p>`}
+  <div class="pill"><span>${dateStr()} · <span class="num">${timeStr()}</span></span><span class="sep"></span><span class="clock" id="clk"></span></div>
+  <div class="photo"><div class="photo-in" id="cphoto" style="cursor:default;${S.coupleOk?`background-image:url('${EV.couplePhoto}')`:""}">${S.coupleOk?"":`<b>${EV.groom} ו${EV.bride}</b>`}</div></div>
+  <form class="card" id="f">
+    <div class="row"><label class="q" for="nm">מה שמך?</label><input type="text" id="nm" maxlength="60" placeholder="הקלידו את שמכם כאן" value="${esc(S.name)}" autocomplete="name"></div>
+    <button class="btn" id="go" ${S.name?"":"disabled"}>כניסה</button>
+    <p class="fine">השם שלך יופיע ליד התמונות והברכות שתשאירו. כל מי שנכנס לדף רואה את התמונות והברכות.</p>
+  </form>`;
+  $("#nm").oninput=e=>$("#go").disabled=!e.target.value.trim();
+  $("#f").onsubmit=e=>{e.preventDefault();S.name=$("#nm").value.trim().slice(0,60);if(!S.name)return;ls.set("guest-name",S.name);home()};
+  tickEntry();
+}
+function tickEntry(){const c=$("#clk");if(!c)return;const t=left();
+  if(t.d>0){c.textContent=`עוד ${t.d} ימים`;c.classList.remove("num")}else{c.textContent=`${pad(t.h)}:${pad(t.m)}:${pad(t.s)}`;c.classList.add("num")}}
+
+/* ---------- מסך ראשי ---------- */
+function home(){
+  S.screen="home";
+  const f=S.feed,t=left(),photos=f.media.length,wishes=f.wishes.length;
+  const g="https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(`החתונה של ${EV.groom} ו${EV.bride}`)+"&dates=20270430T090000Z/20270430T150000Z&location="+encodeURIComponent(EV.venue);
+  // סטורי: התמונה האחרונה של כל אורח
+  const seen=new Set(),stories=[];
+  for(const m of f.media){const k=m.name.trim();if(!seen.has(k)&&m.kind==="photo"){seen.add(k);stories.push(m)}if(stories.length>=15)break}
+  app.innerHTML=`
+  <div class="hero fade"><h1>החתונה של ${EV.groom} ו${EV.bride}</h1><p class="hello muted">שמחים שבאת, <b>${esc(S.name)}</b> · <button class="link" id="chg" style="font-weight:400;font-size:.85rem">לא את/ה?</button></p></div>
+  ${photos+wishes?`<div class="ticker live"><span class="dot"></span><span class="msg" id="tick"></span></div>`:""}
+  <section class="card">
+    <p class="center muted">מתחיל בעוד</p>
+    <div class="count num" id="cnt">${["d","h","m","s"].map((k,i)=>`<div><b>${t[k]}</b><span>${["ימים","שעות","דקות","שניות"][i]}</span></div>`).join("")}</div>
+    <div class="actions">
+      <a class="btn ghost" href="https://waze.com/ul?q=${encodeURIComponent(EV.venue)}&navigate=yes" target="_blank" rel="noopener">${ICON.pin} ניווט ב־Waze</a>
+      <button class="btn ghost" id="inv">${ICON.mail} ההזמנה</button>
+      <a class="btn ghost wide" href="${g}" target="_blank" rel="noopener">${ICON.cal} הוספה ליומן</a>
+    </div>
+  </section>
+  <section style="display:flex;flex-direction:column;gap:10px">
+    <h3>סטורי מהאורחים</h3>
+    <div class="stories">
+      <button class="story" id="addStory"><span class="ring add"><i>+</i></span>הוספה</button>
+      ${stories.map(m=>`<button class="story" data-view="${m.id}"><span class="ring"><i style="background-image:url('${PUB+m.path}')"></i></span>${esc(m.name.split(" ")[0])}</button>`).join("")}
+      ${stories.length?"":`<p class="muted" style="align-self:center;font-size:.9rem">עוד אין תמונות. תהיו הראשונים!</p>`}
+    </div>
+  </section>
+  <section class="card">
+    <h2 class="center">מה בא לך לעשות?</h2>
+    ${feat("album","אלבום האורחים","מצלמים את ההכנות או את הערב? התמונות שתעלו נכנסות לאלבום המשותף.",photos?`כבר <span class="num">${photos}</span> תמונות וסרטונים באלבום`:"האלבום מחכה לתמונה הראשונה","לאלבום")}
+    ${feat("chat","הכירו את הזוג","שאלו כל מה שתרצו לדעת על הזוג ועל האירוע.",f.questions?`כבר <span class="num">${f.questions}</span> שאלות נשאלו`:"","לשאול שאלה")}
+    ${feat("heart","ברכה לזוג","כתבו ברכה לאיתי ולעומר. כל האורחים יכולים לקרוא את הברכות.",wishes?`כבר <span class="num">${wishes}</span> ברכות`:"","לכתוב ברכה")}
+    ${feat("cam","תמונה עם הזוג","מעלים סלפי ומקבלים תמונה ממוסגרת יחד עם איתי ועומר.","","ליצור תמונה")}
+  </section>
+  ${adminCode?`<button class="btn ghost" id="adm">מסך הזוג: כל השאלות והסתרת תמונות</button>`:""}
+  <p class="foot">${EV.groom} ו${EV.bride} · <span class="num">30.04.2027</span> · ${EV.venue}</p>
+  ${EV.phone?`<a class="float" href="https://wa.me/${EV.phone}" target="_blank" rel="noopener" aria-label="וואטסאפ">${ICON.wa}</a>`:""}`;
+  $("#chg").onclick=()=>{S.name="";ls.set("guest-name","");entry()};
+  $("#inv").onclick=invite;
+  $("#addStory").onclick=()=>$("#pick").click();
+  if(adminCode)$("#adm").onclick=admin;
+  app.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>viewer(b.dataset.view));
+  app.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>screens[b.dataset.go]());
+  startTicker();
+}
+function feat(id,t,d,stat,cta){return`<div class="feat"><span class="ico">${ICON[id]}</span><div><h3>${t}</h3><p class="muted">${d}</p>${stat?`<p class="stat">${stat}</p>`:""}<button class="link" data-go="${id}">${cta} ‹</button></div></div>`}
+let tickTimer;
+function startTicker(){clearInterval(tickTimer);const el=$("#tick");if(!el)return;const f=S.feed;let i=0;
+  const last=f.media[0]||f.wishes[0];
+  const msgs=[last&&(f.media[0]?`${f.media[0].name} העלה/תה תמונה לאלבום`:`${f.wishes[0].name} כתב/ה ברכה לזוג`),
+    f.media.length&&`כבר ${f.media.length} תמונות וסרטונים באלבום המשותף`,
+    f.wishes.length&&`כבר ${f.wishes.length} ברכות לזוג`,
+    f.guests&&`${f.guests} אורחים כבר השאירו מזכרת`].filter(Boolean);
+  el.textContent=msgs[0];
+  tickTimer=setInterval(()=>{const e=$("#tick");if(!e)return clearInterval(tickTimer);e.style.opacity=0;setTimeout(()=>{i=(i+1)%msgs.length;e.textContent=msgs[i];e.style.opacity=1},400)},3500);}
+
+function modal(html){const m=document.createElement("div");m.className="modal";m.innerHTML=html;document.body.appendChild(m);
+  m.onclick=e=>{if(e.target===m||e.target.closest("[data-close]"))m.remove()};return m}
+function invite(){
+  modal(`<div class="invite" role="dialog" aria-label="הזמנה">
+    <p class="muted">בשמחה ובהתרגשות</p>
+    <div class="names">${EV.groom}<br>&amp;<br>${EV.bride}</div>
+    <hr><p>מתכבדים להזמינכם לחגוג איתנו את יום נישואינו</p>
+    <p><b>${dateStr()}</b>, <span class="num">30.04.2027</span></p>
+    <p>קבלת פנים <span class="num">${timeStr()}</span></p>
+    <p>${EV.venue}</p>
+    <button class="btn" data-close>סגירה</button></div>`);
+}
+function viewer(id){
+  const list=S.feed.media;let i=list.findIndex(m=>m.id===id);if(i<0)return;
+  const m=modal(`<div class="viewer" role="dialog"><div class="vbox" id="vbox"></div><div class="vbar"><button class="btn ghost" id="vnext">‹ הבאה</button><span id="vcap"></span><button class="btn ghost" data-close>סגירה</button></div></div>`);
+  const show=()=>{const x=list[i];m.querySelector("#vbox").innerHTML=x.kind==="video"?`<video src="${PUB+x.path}" controls playsinline autoplay></video>`:`<img src="${PUB+x.path}" alt="תמונה של ${esc(x.name)}">`;m.querySelector("#vcap").textContent=x.name};
+  m.querySelector("#vnext").onclick=()=>{i=(i+1)%list.length;show()};show();
+}
+
+function topBar(t){return`<div class="top"><button class="back" id="bk">› חזרה</button><b>${t}</b><span style="width:48px"></span></div>`}
+function bindBack(){$("#bk").onclick=home;window.scrollTo(0,0)}
+
+/* ---------- מסכים פנימיים ---------- */
+const screens={
+ album(){
+  S.screen="album";
+  const f=S.feed.media;
+  app.innerHTML=`${topBar("אלבום האורחים")}
+   <div class="drop" id="dz">${ICON.album.replace("<svg","<svg width=36")}<h3>להעלות תמונות או סרטונים</h3><p class="muted">אפשר לבחור כמה ביחד. סרטון עד <span class="num">50MB</span>.</p></div>
+   <p class="muted" id="up" hidden></p>
+   ${f.length?`<div class="grid">${f.map(m=>`<button class="tile" data-view="${m.id}" aria-label="תמונה של ${esc(m.name)}">${m.kind==="video"?`<video src="${PUB+m.path}#t=0.5" preload="metadata" muted playsinline></video><span class="play">▶</span>`:`<img src="${PUB+m.path}" loading="lazy" alt="">`}</button>`).join("")}</div>`:`<p class="center muted">עוד אין תמונות באלבום. תהיו הראשונים להעלות!</p>`}`;
+  bindBack();$("#dz").onclick=()=>$("#pick").click();
+  app.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>viewer(b.dataset.view));
+ },
+ chat(){
+  S.screen="chat";
+  app.innerHTML=`${topBar("הכירו את הזוג")}
+   <div class="center" style="display:flex;flex-direction:column;gap:6px"><h2>הכירו את ${EV.groom} ו${EV.bride}</h2><p class="muted">שאלו כל מה שתרצו לדעת לפני האירוע</p></div>
+   <div class="chat" id="chat"></div>
+   <div class="chips" id="chips"><p class="muted" style="font-size:.9rem">שאלות מומלצות</p>${EV.qa.slice(0,4).map((x,i)=>`<button class="chip" data-i="${i}">‹ ${x.q}</button>`).join("")}</div>
+   <form class="row" id="qf"><input type="text" id="qin" maxlength="500" placeholder="כתבו שאלה..."><button class="btn">שליחה</button></form>
+   <p class="fine">השאלות מגיעות רק לאיתי ולעומר, יחד עם השם שלך.</p>`;
+  bindBack();drawChat();
+  app.querySelectorAll(".chip").forEach(b=>b.onclick=()=>ask(EV.qa[b.dataset.i].q,true));
+  $("#qf").onsubmit=e=>{e.preventDefault();const v=$("#qin").value.trim();if(v){ask(v);$("#qin").value=""}};
+ },
+ heart(){
+  S.screen="heart";
+  app.innerHTML=`${topBar("ברכה לזוג")}
+   <form class="card" id="wf"><label class="q" for="wt" style="white-space:normal">הברכה שלך ל${EV.groom} ו${EV.bride}</label>
+   <textarea id="wt" maxlength="2000" placeholder="מזל טוב..."></textarea><button class="btn" id="wsend">לשלוח ברכה</button></form>
+   <section class="card"><h3>ברכות מהאורחים</h3><div id="wl" style="display:flex;flex-direction:column;gap:12px"></div></section>`;
+  bindBack();drawWishes();
+  $("#wf").onsubmit=async e=>{e.preventDefault();const t=$("#wt").value.trim();if(!t)return;$("#wsend").disabled=true;
+    try{await rpc("guest_add",{p_kind:"wish",p_name:S.name,p_body:t});$("#wt").value="";toast("הברכה נשלחה. תודה!");await load();drawWishes()}
+    catch(err){toast("הברכה לא נשלחה. בדקו את החיבור לאינטרנט ונסו שוב.")}
+    $("#wsend").disabled=false};
+ },
+ cam(){
+  S.screen="cam";
+  app.innerHTML=`${topBar("תמונה עם הזוג")}
+   <div class="card center"><h2>סלפי עם ${EV.groom} ו${EV.bride}</h2><p class="muted">מעלים סלפי, ואנחנו שמים אותו במסגרת חתונה לצד תמונת הזוג.</p>
+   <button class="btn" id="sf">${ICON.cam.replace("<svg","<svg width=20")} לבחור סלפי</button></div>
+   <div id="out" style="display:flex;flex-direction:column;gap:10px"></div>`;
+  bindBack();$("#sf").onclick=()=>$("#pickSelfie").click();
+ }
+};
+function drawChat(){$("#chat").innerHTML=S.chat.map(m=>`<div class="bub ${m.me?"me":"them"}">${esc(m.t)}</div>`).join("")}
+async function ask(q,suggested){
+  S.chat.push({me:1,t:q});
+  const hit=EV.qa.find(x=>x.q===q||x.k.some(k=>q.includes(k)));
+  if(!suggested){try{await rpc("guest_add",{p_kind:"question",p_name:S.name,p_body:q})}catch(e){}}
+  S.chat.push({t:hit?hit.a:"שאלה מעולה! השאלה נשלחה לאיתי ולעומר."});
+  $("#chips").hidden=true;drawChat();
+}
+function drawWishes(){const w=S.feed.wishes;$("#wl").innerHTML=w.length?w.map(x=>`<div class="wish"><b>${esc(x.name)}</b><span>${esc(x.body)}</span></div>`).join(""):`<p class="muted">עוד אין ברכות. תכתבו את הראשונה!</p>`}
+
+/* ---------- העלאת קבצים ---------- */
+function shrink(file,max=1800){return new Promise((res,rej)=>{const u=URL.createObjectURL(file);const im=new Image();
+  im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>b?res(b):rej(),"image/jpeg",.85)};
+  im.onerror=()=>{URL.revokeObjectURL(u);rej()};im.src=u})}
+const VEXT={"video/mp4":"mp4","video/quicktime":"mov","video/webm":"webm"};
+async function uploadBlob(blob,kind,ext,type){
+  const path=`p/${crypto.randomUUID()}.${ext}`;
+  const r=await fetch(`${SB}/storage/v1/object/guests/${path}`,{method:"POST",headers:{apikey:KEY,"Content-Type":type,"x-upsert":"false"},body:blob});
+  if(!r.ok)throw new Error("upload");
+  await rpc("guest_add",{p_kind:kind,p_name:S.name,p_path:path});
+}
+$("#pick").onchange=async e=>{
+  S.busy=true;
+  const files=[...e.target.files];e.target.value="";if(!files.length)return;
+  if(S.screen!=="album")screens.album();
+  const up=$("#up");up.hidden=false;let ok=0,bad=0;
+  for(const[i,f]of files.entries()){
+    up.textContent=`מעלה ${i+1} מתוך ${files.length}...`;
+    try{
+      if(f.type.startsWith("video/")){if(!VEXT[f.type]||f.size>52428800)throw 0;await uploadBlob(f,"video",VEXT[f.type],f.type)}
+      else{await uploadBlob(await shrink(f),"photo","jpg","image/jpeg")}
+      ok++;
+    }catch(err){bad++}
+  }
+  S.busy=false;await load();screens.album();
+  toast(bad?`${ok} הועלו, ${bad} לא הצליחו (סרטון גדול מדי או סוג קובץ לא נתמך)`:`תודה! ${ok===1?"התמונה נוספה":ok+" קבצים נוספו"} לאלבום`);
+};
+
+/* ---------- תמונה ממוסגרת עם הזוג ---------- */
+$("#pickSelfie").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(f)frame(URL.createObjectURL(f))};
+function loadImg(src){return new Promise(r=>{if(!src)return r(null);const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+function cover(ctx,img,x,y,w,h){const k=Math.max(w/img.width,h/img.height);const sw=w/k,sh=h/k;ctx.drawImage(img,(img.width-sw)/2,(img.height-sh)/2,sw,sh,x,y,w,h)}
+async function frame(url){
+  const cv=document.createElement("canvas");cv.width=1080;cv.height=1350;const ctx=cv.getContext("2d");
+  const accent="#55693F",gold="#B0904F",paper="#F7F6EF",ink="#24301F";
+  const [me,cp]=await Promise.all([loadImg(url),loadImg(S.coupleOk?EV.couplePhoto:null)]);
+  ctx.fillStyle=paper;ctx.fillRect(0,0,1080,1350);
+  ctx.strokeStyle=gold;ctx.lineWidth=4;ctx.strokeRect(40,40,1000,1270);ctx.lineWidth=1.5;ctx.strokeRect(56,56,968,1238);
+  const drawP=(img,x,y,rot,label)=>{ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.fillStyle="#fff";ctx.shadowColor="rgba(0,0,0,.18)";ctx.shadowBlur=30;ctx.fillRect(-230,-300,460,640);ctx.shadowBlur=0;
+    if(img)cover(ctx,img,-205,-275,410,520);else{ctx.fillStyle="#E6E9DD";ctx.fillRect(-205,-275,410,520);ctx.fillStyle=accent;ctx.font="500 64px 'Frank Ruhl Libre',serif";ctx.textAlign="center";ctx.fillText(`${EV.groom} ו${EV.bride}`,0,0)}
+    ctx.fillStyle=ink;ctx.font="600 38px Assistant,sans-serif";ctx.textAlign="center";ctx.fillText(label,0,300);ctx.restore()};
+  drawP(cp,330,640,-0.06,`${EV.groom} ו${EV.bride}`);
+  drawP(me,750,660,0.05,S.name);
+  ctx.fillStyle=accent;ctx.textAlign="center";ctx.font="500 76px 'Frank Ruhl Libre',serif";ctx.fillText("מתחתנים!",540,190);
+  ctx.fillStyle=ink;ctx.font="600 40px Assistant,sans-serif";ctx.fillText(`30.04.2027 · ${EV.venue}`,540,1200);
+  const out=$("#out");if(!out)return;
+  out.innerHTML=`<img src="${cv.toDataURL("image/jpeg",.9)}" alt="התמונה הממוסגרת" style="width:100%;border-radius:16px;display:block">
+    <p class="fine center">כדי לשמור בטלפון: לחיצה ארוכה על התמונה ← שמירה</p>
+    <button class="btn" id="toAlbum">להוסיף לאלבום של כולם</button>`;
+  $("#toAlbum").onclick=()=>{$("#toAlbum").disabled=true;cv.toBlob(async b=>{try{await uploadBlob(b,"photo","jpg","image/jpeg");await load();toast("התמונה נוספה לאלבום!")}catch(e){toast("ההעלאה לא הצליחה. נסו שוב.");$("#toAlbum").disabled=false}},"image/jpeg",.9)};
+}
+
+/* ---------- מסך הזוג (רק במכשיר שיש בו את הקוד הסודי של האתר) ---------- */
+async function admin(){
+  S.screen="admin";
+  app.innerHTML=`${topBar("מסך הזוג")}<p class="muted">טוען...</p>`;bindBack();
+  let all;try{all=await rpc("guest_admin",{p_code:adminCode})}catch(e){app.innerHTML=`${topBar("מסך הזוג")}<p>הקוד הסודי לא עבד. היכנסו קודם לאתר התקציב עם הקוד.</p>`;bindBack();return}
+  const q=all.filter(x=>x.kind==="question"),rest=all.filter(x=>x.kind!=="question");
+  const when=d=>new Date(d).toLocaleString("he-IL",{day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"});
+  app.innerHTML=`${topBar("מסך הזוג")}
+   <section class="card"><h3>שאלות מהאורחים (<span class="num">${q.length}</span>)</h3>${q.map(x=>`<div class="wish"><b>${esc(x.name)} <span class="fine num">${when(x.created_at)}</span></b><span>${esc(x.body)}</span></div>`).join("")||`<p class="muted">עוד אין שאלות.</p>`}</section>
+   <section class="card"><h3>תמונות וברכות</h3><p class="fine">פריט מוסתר נעלם מהדף של האורחים. אפשר להחזיר אותו.</p>
+   ${rest.map(x=>`<div class="arow ${x.hidden?"off":""}">${x.path?`<img src="${PUB+x.path}" alt="">`:""}<div style="min-width:0;flex:1"><b>${esc(x.name)}</b> <span class="fine num">${when(x.created_at)}</span>${x.body?`<p>${esc(x.body)}</p>`:""}</div><button class="btn ghost" data-h="${x.id}" data-v="${x.hidden?0:1}">${x.hidden?"להחזיר":"להסתיר"}</button></div>`).join("")||`<p class="muted">עוד אין כלום.</p>`}</section>`;
+  bindBack();
+  app.querySelectorAll("[data-h]").forEach(b=>b.onclick=async()=>{b.disabled=true;try{await rpc("guest_hide",{p_code:adminCode,p_id:b.dataset.h,p_hidden:b.dataset.v==="1"});await load();admin()}catch(e){toast("לא הצליח, נסו שוב");b.disabled=false}});
+}
+
+setInterval(()=>{tickEntry();const c=$("#cnt");if(c){const t=left();c.querySelectorAll("b").forEach((b,i)=>b.textContent=t[["d","h","m","s"][i]])}},1000);
+/* רענון אוטומטי כל 30 שניות במסך הראשי ובאלבום */
+setInterval(async()=>{if(S.busy||document.hidden||!["home","album"].includes(S.screen))return;const before=JSON.stringify(S.feed);await load();if(JSON.stringify(S.feed)!==before){S.screen==="home"?home():screens.album()}},30000);
+(async()=>{S.name?home():entry();await load();S.screen==="home"?home():S.screen==="entry"?entry():0})();
+</script>
+</body>
+</html>
