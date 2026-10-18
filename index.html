@@ -277,6 +277,9 @@ input{font:inherit;color:inherit}
 .att-add{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--forest-2);border:1px dashed color-mix(in srgb,var(--forest-2) 45%,transparent);border-radius:99px;padding:4px 12px;cursor:pointer}
 .att-add::before{content:"+";font-size:.95rem;line-height:1}
 .att-msg{font-size:.76rem;color:var(--muted)}
+.item-docs{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.item-docs-l{font-size:.72rem;color:var(--muted);font-weight:500}
+.item-docs .att{flex:1}
 .viewer{position:fixed;inset:0;z-index:60;background:rgba(20,10,14,.82);display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top,0px)) max(10px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px));gap:8px}
 .viewer-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:#fff}
 .viewer-bar b{flex:1 1 140px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
@@ -733,7 +736,7 @@ function normalize(s){
   const groups=Array.isArray(s.groups)&&s.groups.length?s.groups.slice(0,4):e.groups;
   const gids=new Set(groups.map(g=>g.id));
   return{v:2,guests:Number.isFinite(+s.guests)?+s.guests:300,reservePct:Number.isFinite(+s.reservePct)?+s.reservePct:10,groups,
-    items:(s.items||[]).map(i=>({id:i.id||uid(),group:gids.has(i.group)?i.group:groups[groups.length-1].id,name:String(i.name??""),amount:+i.amount||0,kind:KIND[i.kind]?i.kind:"fixed",base:+i.base||0,status:STATUS[i.status]?i.status:"est",on:i.on!==false,note:String(i.note??""),low:+i.low||0,high:+i.high||0,payments:(Array.isArray(i.payments)?i.payments:[]).map(x=>({id:String(x.id||uid("p")),amount:+x.amount||0,date:String(x.date||""),payer:String(x.payer||"us"),paid:x.paid!==false,for:String(x.for??""),ref:String(x.ref??""),note:String(x.note??""),files:normFiles(x.files)}))})),
+    items:(s.items||[]).map(i=>({id:i.id||uid(),group:gids.has(i.group)?i.group:groups[groups.length-1].id,name:String(i.name??""),amount:+i.amount||0,kind:KIND[i.kind]?i.kind:"fixed",base:+i.base||0,status:STATUS[i.status]?i.status:"est",on:i.on!==false,note:String(i.note??""),low:+i.low||0,high:+i.high||0,files:normFiles(i.files),payments:(Array.isArray(i.payments)?i.payments:[]).map(x=>({id:String(x.id||uid("p")),amount:+x.amount||0,date:String(x.date||""),payer:String(x.payer||"us"),paid:x.paid!==false,for:String(x.for??""),ref:String(x.ref??""),note:String(x.note??""),files:normFiles(x.files)}))})),
     incomes:(s.incomes||[]).map(i=>({id:i.id||uid("n"),name:String(i.name??""),amount:+i.amount||0,on:i.on!==false,note:String(i.note??"")})),
     gifts:Array.isArray(s.gifts)&&s.gifts.length?s.gifts.map(g=>({id:g.id,label:String(g.label??""),share:+g.share||0,amount:+g.amount||0})):e.gifts,
     payers:(Array.isArray(s.payers)&&s.payers.length?s.payers:e.payers).map(x=>({id:String(x.id||uid("y")),name:String(x.name??""),pledge:+x.pledge||0,transfers:(Array.isArray(x.transfers)?x.transfers:[]).map(t=>({id:String(t.id||uid("t")),date:String(t.date||""),amount:+t.amount||0,ref:String(t.ref??""),note:String(t.note??""),files:normFiles(t.files)}))}))};
@@ -1022,6 +1025,7 @@ function renderPay(){
         <div class="pay-cost"><label>${i.kind==="perGuest"?"מחיר לאורח":i.kind==="extraGuest"?`לאורח מעל ${i.base}`:"עלות"}</label><div class="i-amt-wrap"><input class="i-amt" data-if="amount" inputmode="numeric" value="${commas(i.amount)}" placeholder="0" aria-label="עלות"></div><div class="pay-left num" data-pl="${esc(i.id)}"></div></div>
       </div>
       <div class="cum-bar" aria-hidden="true"><i data-pb="${esc(i.id)}"></i></div>
+      <div class="item-docs"><span class="item-docs-l">חוזה והצעות</span>${filesHTML(i.files||[],"צירוף חוזה / הצעה")}</div>
       ${i.payments.map(x=>paymentHTML(i,x)).join("")}
       <button type="button" class="add-btn pay-add" data-pact="add">הוספת תשלום</button>
     </div>`).join("")+`</div>`;
@@ -1093,7 +1097,7 @@ function recalcPay(){
   $("payers-sum").textContent=`שולם לספקים ${ils(tot)}${trs?` · הועבר אלינו ${ils(trs)}`:""}`;
 }
 const findTr=el=>{const row=el.closest("[data-tid]");const yid=el.closest("[data-yid]");if(!row||!yid)return{};const p=state.payers.find(y=>y.id===yid.dataset.yid);const t=p&&p.transfers.find(x=>x.id===row.dataset.tid);return{p,t}};
-const fileOwner=el=>{const pr=el.closest("[data-pid]");if(pr)return findPay(el).x;const tr=el.closest("[data-tid]");if(tr)return findTr(el).t;return null};
+const fileOwner=el=>{const pr=el.closest("[data-pid]");if(pr)return findPay(el).x;const tr=el.closest("[data-tid]");if(tr)return findTr(el).t;const pi=el.closest(".pay-item");if(pi){const it=state.items.find(i=>i.id===pi.dataset.item);if(it){it.files=it.files||[];return it}}return null};
 function showFile(blob,name){
   const url=URL.createObjectURL(blob),isImg=/^image\//.test(blob.type);
   const ov=document.createElement("div");ov.className="viewer";ov.setAttribute("dir","rtl");ov.setAttribute("role","dialog");ov.setAttribute("aria-label",name);
