@@ -17,6 +17,7 @@ body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}
 .lock-card input{border:1px solid var(--line,#ECDCD7);background:var(--paper-2,#F8EEEA);color:var(--ink,#2E1A1E);border-radius:12px;padding:12px;font-size:1rem;direction:ltr;text-align:right}
 .lock-card button{background:var(--forest,#6B2333);color:var(--on-forest,#fff);border:0;border-radius:12px;padding:12px;font-weight:600;font-size:1rem;cursor:pointer}
 .lock-err{color:var(--loss,#B23A2B)!important;min-height:1em}
+.offline-bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;margin:0 auto 12px;max-width:740px;background:var(--loss-soft,#F8E1DB);color:var(--loss,#B23A2B);border:1px solid color-mix(in srgb,var(--loss,#B23A2B) 35%,transparent);border-radius:14px;padding:10px 14px;font-size:.86rem;line-height:1.45;text-align:right}
 </style>
 </head>
 <body>
@@ -710,11 +711,21 @@ body:not([data-tab="budget"]) .mini-bar{display:none}
 
   /* מאגר משותף: משיכה כל 15 שניות ובחזרה לדף */
   const MAP={"plan/main":{id:"plan",wrap:d=>({state:d}),unwrap:b=>b.state},"guests/main":{id:"guests",wrap:d=>d,unwrap:b=>({categories:b.categories,guests:b.guests})}};
-  const subs={};const lastAt={};let polling=false,locked=false;
+  const subs={};const lastAt={};let polling=false,locked=false,loaded=false,failStreak=0;
+  function offline(on){
+    let b=document.getElementById("offline-bar");
+    if(!on){if(b)b.hidden=true;return}
+    if(!b){if(!document.body)return;b=document.createElement("div");b.id="offline-bar";b.className="offline-bar";b.setAttribute("dir","rtl");b.setAttribute("role","alert");
+      b.innerHTML='<b>אין חיבור למסד הנתונים.</b> הנתונים לא נמחקו. אם עבר זמן מאז הכניסה האחרונה, כנראה שהוא "נרדם" וצריך להעיר אותו ב-Supabase. עד אז אי אפשר לשמור שינויים.';
+      document.body.prepend(b)}
+    b.hidden=false;
+    ["sync","psync","gsync"].forEach(id=>{const el=document.getElementById(id);if(el){el.dataset.s="error";const s=el.querySelector("span");if(s)s.textContent="אין חיבור"}});
+  }
   async function poll(){
     if(polling||locked)return;polling=true;
     try{
       const all=await rpc("wedding_get",{p_code:code});
+      loaded=true;failStreak=0;offline(false);
       Object.keys(subs).forEach(path=>{
         const cfg=MAP[path],doc=all[cfg.id];
         if(!doc){if(!(path in lastAt)){lastAt[path]=null;subs[path].forEach(f=>f({exists:false,metadata:{hasPendingWrites:false},data:()=>undefined}))}return}
@@ -724,6 +735,7 @@ body:not([data-tab="budget"]) .mini-bar{display:none}
       });
     }catch(e){
       if(e.code==="bad_code"){locked=true;try{localStorage.removeItem(CODE_KEY)}catch(_){ }lock("הקוד השתנה או לא נכון. הקלידו את הקוד החדש.")}
+      else if(++failStreak>=1)offline(true);
     }finally{polling=false}
   }
   setInterval(poll,15000);
@@ -732,7 +744,7 @@ body:not([data-tab="budget"]) .mini-bar{display:none}
 
   const db={doc(path){const cfg=MAP[path];return{
     onSnapshot(next){(subs[path]=subs[path]||[]).push(next);setTimeout(poll,0);return()=>{subs[path]=subs[path].filter(f=>f!==next)}},
-    async set(body){const at=await rpc("wedding_put",{p_code:code,p_id:cfg.id,p_data:cfg.unwrap(body)});lastAt[path]=at}
+    async set(body){if(!loaded){const e=new Error("not loaded");e.code="unavailable";throw e}const at=await rpc("wedding_put",{p_code:code,p_id:cfg.id,p_data:cfg.unwrap(body)});lastAt[path]=at}
   }}};
   const downloads={async save({filename,data}){
     const blob=data instanceof Blob?data:new Blob([data],{type:filename.endsWith(".csv")?"text/csv;charset=utf-8":"text/html;charset=utf-8"});
