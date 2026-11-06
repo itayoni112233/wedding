@@ -383,9 +383,48 @@ details[open]>summary .chev{transform:rotate(-90deg)}
 .bi>.item{border-top:1px dashed var(--line);background:var(--paper-2)}
 .bi-sum .chev{grid-row:1;grid-column:3}
 
+
+/* songs */
+.songs-share-row{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.songs-share{background:var(--paper);color:var(--forest);border-radius:12px;padding:10px 16px;font-weight:700;font-size:.92rem}
+.songs-msg{font-size:.8rem;opacity:.9}
+.song-list{display:flex;flex-direction:column}
+.song,.s-res{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 16px;border-top:1px solid var(--line)}
+.song{grid-template-columns:48px minmax(0,1fr)}
+.song-acts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-inline-start:58px}
+.song-art{width:48px;height:48px;border-radius:10px;overflow:hidden;background:var(--gold-soft);color:var(--gold);display:grid;place-items:center}
+.song-art img{width:100%;height:100%;object-fit:cover;display:block}
+.song-art svg{width:22px;height:22px}
+.song-main{display:flex;flex-direction:column;min-width:0;gap:1px}
+.song-main b{font-size:.94rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.song-main small{font-size:.78rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.song-note{border:0;border-bottom:1px dashed var(--line);background:transparent;font-size:.8rem;color:var(--ink);padding:3px 0;margin-top:3px;min-width:0}
+.song-note:focus{outline:none;border-bottom-color:var(--gold)}
+.song-note::placeholder{color:var(--faint)}
+.s-btn{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--forest);color:var(--on-forest);flex:none}
+.s-btn svg{width:15px;height:15px}
+.s-btn.on{background:var(--gold);color:#fff}
+.s-am{font-size:.76rem;font-weight:600;color:var(--forest-2);border:1px solid color-mix(in srgb,var(--forest-2) 35%,transparent);border-radius:99px;padding:4px 11px;text-decoration:none}
+.s-move{display:inline-flex;gap:2px}
+.s-mini{font-size:.62rem;color:var(--muted);border:1px solid var(--line);border-radius:7px;padding:3px 7px}
+.s-mini:disabled{opacity:.35}
+.song-acts .link{margin-inline-start:auto}
+.song-search{padding:12px 16px 14px;border-top:1px solid var(--line);background:var(--paper-2)}
+.s-q{width:100%;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:12px;padding:10px 12px;font-size:.92rem}
+.s-q:focus{outline:none;border-color:var(--gold)}
+.s-results{margin-top:8px;background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.s-res{grid-template-columns:44px minmax(0,1fr) auto auto;padding:8px 10px}
+.s-res:first-child{border-top:0}
+.s-res .song-art{width:44px;height:44px}
+.s-add{font-size:.78rem;font-weight:700;color:var(--on-forest);background:var(--forest);border-radius:10px;padding:7px 11px}
+.s-msg{padding:10px 12px;font-size:.84rem;color:var(--muted)}
+.s-manual{display:block;width:100%;text-align:right;padding:9px 12px;font-size:.8rem;color:var(--forest-2);border-top:1px dashed var(--line)}
+#song-cats{gap:16px}
+
 /* tabs */
 .tabs{display:flex;gap:4px;background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:4px;align-self:center;box-shadow:var(--shadow)}
-.tabs button{padding:8px 24px;border-radius:99px;font-weight:600;font-size:.95rem;color:var(--muted)}
+.tabs button{padding:8px 18px;border-radius:99px;font-weight:600;font-size:.92rem;color:var(--muted)}
+@media (max-width:420px){.tabs button{padding:8px 11px;font-size:.86rem}}
 .tabs button[aria-selected="true"]{background:var(--forest);color:var(--on-forest)}
 .tab{display:flex;flex-direction:column;gap:20px}
 .tab[hidden]{display:none}
@@ -458,7 +497,7 @@ body:not([data-tab="budget"]) .mini-bar{display:none}
 </div></div>
 
 <div class="wrap" id="app" dir="rtl" lang="he">
-  <nav class="tabs" role="tablist" aria-label="מעבר בין לשוניות"><button type="button" role="tab" data-tab="budget" aria-selected="true">תקציב</button><button type="button" role="tab" data-tab="pay" aria-selected="false">תשלומים</button><button type="button" role="tab" data-tab="guests" aria-selected="false">מוזמנים</button></nav>
+  <nav class="tabs" role="tablist" aria-label="מעבר בין לשוניות"><button type="button" role="tab" data-tab="budget" aria-selected="true">תקציב</button><button type="button" role="tab" data-tab="pay" aria-selected="false">תשלומים</button><button type="button" role="tab" data-tab="guests" aria-selected="false">מוזמנים</button><button type="button" role="tab" data-tab="songs" aria-selected="false">שירים</button></nav>
   <div class="tab" id="tab-budget">
   <section class="hero" id="hero" aria-label="סיכום">
     <svg class="sprig" viewBox="0 0 170 170" aria-hidden="true" id="sprig"></svg>
@@ -584,6 +623,27 @@ body:not([data-tab="budget"]) .mini-bar{display:none}
       <div id="pay-items"></div>
       <datalist id="pay-for-list"><option value="מקדמה"><option value="תשלום ראשון"><option value="תשלום שני"><option value="תשלום שלישי"><option value="יתרה"><option value="תשלום סופי"><option value="תוספת"></datalist>
     </section>
+  </div>
+  <div class="tab" id="tab-songs" hidden>
+    <section class="hero" aria-label="השירים">
+      <div class="hero-top">
+        <div>
+          <div class="eyebrow" style="color:var(--on-forest);opacity:.7">השירים שלנו</div>
+          <h1 class="venue-name">מה מנגנים</h1>
+          <div class="date">הנחלה · 30.4.2027</div>
+        </div>
+      </div>
+      <div class="hero-main">
+        <div class="eyebrow">שירים ברשימה</div>
+        <div class="big num" id="songs-total">0</div>
+        <div class="big-sub">מחפשים, שומעים קטע, מוסיפים. בסוף שולחים ל-DJ.</div>
+      </div>
+      <div class="songs-share-row">
+        <button type="button" class="songs-share" id="songs-share">שליחת הרשימה ל-DJ</button>
+        <span class="songs-msg" id="songs-msg" role="status"></span>
+      </div>
+    </section>
+    <div id="song-cats" class="tab"></div>
   </div>
   <div class="tab" id="tab-guests" hidden>
     <section class="couple" aria-label="אנחנו">
@@ -792,6 +852,13 @@ const KIND={fixed:"סכום קבוע",perGuest:"לכל אורח",extraGuest:"ל�
 const KNEXT={fixed:"perGuest",perGuest:"extraGuest",extraGuest:"fixed"};
 const LETTERS=["א","ב","ג","ד"];
 const DEFAULT_GROUPS=[{id:"venue",name:"אולם וקייטרינג"},{id:"vendors",name:"ספקים והפקה"},{id:"us",name:"אנחנו: לבוש, איפור וטבעות"},{id:"guests",name:"אורחים ושונות"}];
+const SONG_CATS=[
+  {id:"entry",name:"כניסה לחופה",hint:"כניסת החתן, כניסת הכלה, ההורים",note:"למשל: כניסת הכלה, מ-0:45"},
+  {id:"glass",name:"שבירת הכוס",hint:"השיר שמתחיל ברגע שהכוס נשברת",note:"למשל: מהפזמון"},
+  {id:"party",name:"שירים לחתונה",hint:"רחבה, ריקודים, שירים שחייבים",note:"למשל: ריקוד ראשון, סט מזרחי"},
+  {id:"noplay",name:"לא לנגן",hint:"שירים שה-DJ לא ינגן",note:"למה לא (לא חובה)"}
+];
+function normSongs(x){const o={};SONG_CATS.forEach(c=>{o[c.id]=(x&&Array.isArray(x[c.id])?x[c.id]:[]).filter(t=>t&&(t.title||t.url)).map(t=>({id:String(t.id||uid("s")),title:String(t.title||""),artist:String(t.artist||""),art:String(t.art||""),preview:String(t.preview||""),url:String(t.url||""),note:String(t.note||"")}))});return o}
 const DEFAULT_PAYERS=[{id:"us",name:"אנחנו",pledge:0},{id:"groom",name:"הורי החתן",pledge:0},{id:"bride",name:"הורי הכלה",pledge:0}];
 const DEFAULT_GIFTS=[{id:"g1",label:"מתנה צנועה",share:20,amount:400},{id:"g2",label:"מתנה רגילה",share:40,amount:525},{id:"g3",label:"בגובה המנה",share:30,amount:556},{id:"g4",label:"מתנה נדיבה",share:10,amount:1000}];
 const $=id=>document.getElementById(id);
@@ -803,7 +870,7 @@ const parse=s=>{const d=String(s).replace(/[^\d]/g,"");return d?Math.min(1e9,par
 const uid=p=>(p||"i")+Math.random().toString(36).slice(2,9);
 
 /* ---------- state ---------- */
-function emptyState(){return{v:2,guests:300,reservePct:10,groups:DEFAULT_GROUPS.map(g=>({...g})),items:[],incomes:[],gifts:DEFAULT_GIFTS.map(g=>({...g})),payers:DEFAULT_PAYERS.map(p=>({...p,transfers:[]}))}}
+function emptyState(){return{v:2,guests:300,reservePct:10,groups:DEFAULT_GROUPS.map(g=>({...g})),items:[],incomes:[],gifts:DEFAULT_GIFTS.map(g=>({...g})),payers:DEFAULT_PAYERS.map(p=>({...p,transfers:[]})),songs:{entry:[],glass:[],party:[],noplay:[]}}}
 function fromV1(s){
   const out=emptyState();out.guests=+s.guests||300;out.reservePct=+s.reservePct||10;
   const v=s.venue||{};
@@ -826,6 +893,7 @@ function normalize(s){
     items:(s.items||[]).map(i=>({id:i.id||uid(),group:gids.has(i.group)?i.group:groups[groups.length-1].id,name:String(i.name??""),amount:+i.amount||0,kind:KIND[i.kind]?i.kind:"fixed",base:+i.base||0,status:STATUS[i.status]?i.status:"est",on:i.on!==false,note:String(i.note??""),low:+i.low||0,high:+i.high||0,files:normFiles(i.files),payments:(Array.isArray(i.payments)?i.payments:[]).map(x=>({id:String(x.id||uid("p")),amount:+x.amount||0,date:String(x.date||""),payer:String(x.payer||"us"),paid:x.paid!==false,for:String(x.for??""),ref:String(x.ref??""),note:String(x.note??""),files:normFiles(x.files)}))})),
     incomes:(s.incomes||[]).map(i=>({id:i.id||uid("n"),name:String(i.name??""),amount:+i.amount||0,on:i.on!==false,note:String(i.note??"")})),
     gifts:Array.isArray(s.gifts)&&s.gifts.length?s.gifts.map(g=>({id:g.id,label:String(g.label??""),share:+g.share||0,amount:+g.amount||0})):e.gifts,
+    songs:normSongs(s.songs),
     payers:(Array.isArray(s.payers)&&s.payers.length?s.payers:e.payers).map(x=>({id:String(x.id||uid("y")),name:String(x.name??""),pledge:+x.pledge||0,transfers:(Array.isArray(x.transfers)?x.transfers:[]).map(t=>({id:String(t.id||uid("t")),date:String(t.date||""),amount:+t.amount||0,ref:String(t.ref??""),note:String(t.note??""),files:normFiles(t.files)}))}))};
 }
 
@@ -961,7 +1029,7 @@ function renderGifts(){
 function renderAll(){
   pendingRemote=false;
   $("g-range").value=state.guests;$("g-num").value=state.guests;$("reserve").value=state.reservePct;
-  renderGroups();renderIncomes();renderGifts();renderPay();recalc();
+  renderGroups();renderIncomes();renderGifts();renderPay();renderSongs();recalc();
 }
 const ins=(k,h)=>`<div class="ins"><span class="k">${k}</span><p>${h}</p></div>`;
 function recalc(){
@@ -1093,6 +1161,106 @@ document.addEventListener("focusout",e=>{
   if(d.matches(".bgroup"))d.open?BOPEN.groups.add(d.dataset.gid):BOPEN.groups.delete(d.dataset.gid);
   else if(d.matches(".bi"))d.open?BOPEN.items.add(d.dataset.bid):BOPEN.items.delete(d.dataset.bid);
 },true));
+
+/* ---------- songs ---------- */
+const songAudio=new Audio();let songPlaying=null;
+songAudio.addEventListener("ended",()=>{songPlaying=null;markPlaying()});
+function markPlaying(){document.querySelectorAll("[data-play]").forEach(b=>{const on=b.dataset.play===songPlaying;b.classList.toggle("on",on);b.setAttribute("aria-label",on?"עצירה":"השמעת קטע");b.innerHTML=on?PAUSE_I:PLAY_I})}
+const PLAY_I='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg>';
+const PAUSE_I='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 3.5h2.5v9H4.5zM9 3.5h2.5v9H9z" fill="currentColor"/></svg>';
+const NOTE_I='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18.5a2.5 2.5 0 1 1-2.5-2.5c.5 0 1 .1 1.5.4V5.5l11-2v12a2.5 2.5 0 1 1-2.5-2.5c.5 0 1 .1 1.5.4V7.2l-9 1.7z" fill="currentColor"/></svg>';
+function playSong(key,url){
+  if(!url)return;
+  if(songPlaying===key){songAudio.pause();songPlaying=null;markPlaying();return}
+  songAudio.src=url;songAudio.play().then(()=>{songPlaying=key;markPlaying()}).catch(()=>{songPlaying=null;markPlaying()});
+}
+const amSearch=q=>"https://music.apple.com/il/search?term="+encodeURIComponent(q);
+function songRow(c,t,k,n){
+  const key="s:"+t.id;
+  return`<div class="song" data-sid="${esc(t.id)}" data-cat="${c.id}">
+    <div class="song-art">${t.art?`<img src="${esc(t.art)}" alt="" loading="lazy">`:NOTE_I}</div>
+    <div class="song-main"><b>${esc(t.title||"בלי שם")}</b><small>${esc(t.artist||"")}</small>
+      <input class="song-note" data-snote value="${esc(t.note)}" placeholder="${esc(c.note)}" aria-label="הערה לשיר"></div>
+    <div class="song-acts">
+      ${t.preview?`<button type="button" class="s-btn" data-play="${key}" data-src="${esc(t.preview)}" aria-label="השמעת קטע">${PLAY_I}</button>`:""}
+      <a class="s-am" href="${esc(t.url||amSearch(t.title+" "+t.artist))}" target="_blank" rel="noopener">Apple Music</a>
+      <span class="s-move"><button type="button" class="s-mini" data-sact="up" aria-label="למעלה"${k===0?" disabled":""}>▲</button><button type="button" class="s-mini" data-sact="down" aria-label="למטה"${k===n-1?" disabled":""}>▼</button></span>
+      <button type="button" class="link danger" data-sact="del">מחיקה</button>
+    </div>
+  </div>`;
+}
+function renderSongs(){
+  const box=$("song-cats");if(!box)return;
+  const S=state.songs;
+  box.innerHTML=SONG_CATS.map(c=>{const list=S[c.id]||[];return`<section class="card2 song-cat" data-cat="${c.id}">
+    <div class="hd"><h3>${c.name} <span class="num s-count">(${list.length})</span></h3><span>${c.hint}</span></div>
+    <div class="song-list">${list.map((t,k)=>songRow(c,t,k,list.length)).join("")||`<div class="empty2">עוד אין שירים. חפשו למטה.</div>`}</div>
+    <div class="song-search">
+      <input class="s-q" data-sq="${c.id}" placeholder="חיפוש שיר או זמר באפל מיוזיק…" aria-label="חיפוש שיר ל${c.name}" autocomplete="off">
+      <div class="s-results" data-sres="${c.id}" hidden></div>
+    </div>
+  </section>`}).join("");
+  const tot=SONG_CATS.reduce((a,c)=>a+(S[c.id]||[]).length,0);
+  $("songs-total").textContent=tot;
+  markPlaying();
+}
+let sTimer=null,sSeq=0;const sCache={};
+async function searchSongs(cat,q,box){
+  const my=++sSeq;
+  if(q.trim().length<2){box.hidden=true;box.innerHTML="";return}
+  box.hidden=false;box.innerHTML=`<div class="s-msg">מחפש…</div>`;
+  try{
+    let res=sCache[q];
+    if(!res){const r=await fetch("https://itunes.apple.com/search?term="+encodeURIComponent(q)+"&country=il&media=music&entity=song&limit=8");res=(await r.json()).results||[];sCache[q]=res}
+    if(my!==sSeq)return;
+    box.innerHTML=(res.length?res.map((r,k)=>{const key="r:"+r.trackId;return`<div class="s-res" data-k="${k}">
+      <div class="song-art"><img src="${esc((r.artworkUrl100||"").replace("100x100","200x200"))}" alt="" loading="lazy"></div>
+      <div class="song-main"><b>${esc(r.trackName)}</b><small>${esc(r.artistName)}</small></div>
+      ${r.previewUrl?`<button type="button" class="s-btn" data-play="${key}" data-src="${esc(r.previewUrl)}" aria-label="השמעת קטע">${PLAY_I}</button>`:""}
+      <button type="button" class="s-add" data-sadd="${k}">הוספה</button>
+    </div>`}).join(""):`<div class="s-msg">לא נמצא באפל מיוזיק.</div>`)+
+      `<button type="button" class="s-manual" data-smanual>הוספה ידנית: "${esc(q.trim())}"</button>`;
+    box._res=res;box._q=q.trim();markPlaying();
+  }catch(e){if(my===sSeq)box.innerHTML=`<div class="s-msg">אין חיבור לאפל מיוזיק כרגע.</div><button type="button" class="s-manual" data-smanual>הוספה ידנית: "${esc(q.trim())}"</button>`;box._res=[];box._q=q.trim()}
+}
+$("tab-songs").addEventListener("input",e=>{
+  const t=e.target;
+  if(t.dataset.sq){const box=document.querySelector(`[data-sres="${t.dataset.sq}"]`);clearTimeout(sTimer);sTimer=setTimeout(()=>searchSongs(t.dataset.sq,t.value,box),350);return}
+  if(t.hasAttribute("data-snote")){const row=t.closest(".song");const it=(state.songs[row.dataset.cat]||[]).find(x=>x.id===row.dataset.sid);if(it){it.note=t.value.slice(0,120);save()}}
+});
+$("tab-songs").addEventListener("click",async e=>{
+  const pb=e.target.closest("[data-play]");if(pb){playSong(pb.dataset.play,pb.dataset.src);return}
+  const add=e.target.closest("[data-sadd],[data-smanual]");
+  if(add){const box=add.closest(".s-results"),cat=box.dataset.sres,list=state.songs[cat];
+    let item;
+    if(add.hasAttribute("data-smanual"))item={id:uid("s"),title:box._q,artist:"",art:"",preview:"",url:amSearch(box._q),note:""};
+    else{const r=box._res[+add.dataset.sadd];if(!r)return;item={id:uid("s"),title:r.trackName||"",artist:r.artistName||"",art:(r.artworkUrl100||"").replace("100x100","200x200"),preview:r.previewUrl||"",url:r.trackViewUrl||amSearch(r.trackName+" "+r.artistName),note:""}}
+    if(list.some(x=>x.title===item.title&&x.artist===item.artist)){add.textContent="כבר ברשימה";return}
+    list.push(item);songAudio.pause();songPlaying=null;renderSongs();save();
+    const q=document.querySelector(`[data-sq="${cat}"]`);if(q){q.value="";}
+    return}
+  const b=e.target.closest("[data-sact]");if(!b)return;
+  const row=b.closest(".song"),list=state.songs[row.dataset.cat],k=list.findIndex(x=>x.id===row.dataset.sid);if(k<0)return;
+  const a=b.dataset.sact;
+  if(a==="up"&&k>0){[list[k-1],list[k]]=[list[k],list[k-1]];renderSongs();save()}
+  else if(a==="down"&&k<list.length-1){[list[k+1],list[k]]=[list[k],list[k+1]];renderSongs();save()}
+  else if(a==="del")armDelete(b,()=>{list.splice(k,1);renderSongs();save()});
+});
+function songsText(){
+  const lines=["🎵 השירים של עומר ואיתי","החתונה בנחלה · יום שישי 30.4.2027",""];
+  SONG_CATS.forEach(c=>{const list=state.songs[c.id]||[];if(!list.length)return;
+    lines.push(c.id==="noplay"?"🚫 "+c.name+":":"• "+c.name+":");
+    list.forEach((t,k)=>{lines.push(`${k+1}. ${t.title}${t.artist?" – "+t.artist:""}${t.note?" ("+t.note+")":""}`);if(t.url&&c.id!=="noplay")lines.push("   "+t.url)});
+    lines.push("")});
+  return lines.join("\n").trim();
+}
+$("songs-share").addEventListener("click",async()=>{
+  const msg=$("songs-msg"),text=songsText();
+  if(!SONG_CATS.some(c=>(state.songs[c.id]||[]).length)){msg.textContent="עוד אין שירים ברשימה.";return}
+  if(navigator.share){try{await navigator.share({title:"השירים לחתונה",text});msg.textContent="";return}catch(err){if(err&&err.name==="AbortError")return}}
+  try{await navigator.clipboard.writeText(text);msg.textContent="הרשימה הועתקה. אפשר להדביק בוואטסאפ ל-DJ."}
+  catch(err){msg.textContent="לא הצלחתי להעתיק. נסו שוב."}
+});
 
 /* ---------- payments ---------- */
 const fmtDate=d=>{if(!d)return"בלי תאריך";const[y,m,dd]=d.split("-");return dd&&m?`${+dd}.${+m}.${y}`:d};
@@ -1585,15 +1753,15 @@ document.addEventListener("focusout",()=>setTimeout(()=>{if(pendingRemote&&!edit
 
 /* ---------- tabs ---------- */
 function showTab(t){
-  if(!["budget","pay","guests"].includes(t))t="budget";
-  ["budget","pay","guests"].forEach(k=>{$("tab-"+k).hidden=k!==t});
+  if(!["budget","pay","guests","songs"].includes(t))t="budget";
+  ["budget","pay","guests","songs"].forEach(k=>{$("tab-"+k).hidden=k!==t});
   document.body.dataset.tab=t;
   document.querySelectorAll(".tabs [data-tab]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===t)));
   try{localStorage.setItem("nahala-tab",t)}catch(e){}
 }
 document.querySelectorAll(".tabs [data-tab]").forEach(b=>b.addEventListener("click",()=>{showTab(b.dataset.tab);window.scrollTo(0,0)}));
 let startTab="budget";
-if(["#guests","#pay","#budget"].includes(location.hash))startTab=location.hash.slice(1);else{try{startTab=localStorage.getItem("nahala-tab")||"budget"}catch(e){}}
+if(["#guests","#pay","#budget","#songs"].includes(location.hash))startTab=location.hash.slice(1);else{try{startTab=localStorage.getItem("nahala-tab")||"budget"}catch(e){}}
 showTab(startTab);
 const sp=$("sprig");if(sp){$("sprig2").innerHTML=sp.innerHTML;$("sprig2").style.color="var(--on-forest)"}
 
